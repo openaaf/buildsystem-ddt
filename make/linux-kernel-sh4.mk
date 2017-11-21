@@ -43,12 +43,15 @@ COMMON_PATCHES_24 = \
 		linux-ftdi_sio.c_stm24_$(KERNEL_LABEL).patch \
 		linux-sh4-lzma-fix_stm24_$(KERNEL_LABEL).patch \
 		linux-tune_stm24.patch \
-		linux-net_stm24.patch \
 		linux-sh4-permit_gcc_command_line_sections_stm24.patch \
 		linux-sh4-mmap_stm24.patch \
 		linux-defined_is_deprecated_timeconst.pl_stm24_$(KERNEL_LABEL).patch \
 		$(if $(P0217),linux-patch_swap_notify_core_support_stm24_$(KERNEL_LABEL).patch) \
-		$(if $(P0209),linux-sh4-dwmac_stm24_$(KERNEL_LABEL).patch)
+		$(if $(P0209),linux-sh4-dwmac_stm24_$(KERNEL_LABEL).patch) \
+		linux-squashfs-downgrade-stm24_$(KERNEL_LABEL)-to-stm23.patch \
+		linux-squashfs3.0_lzma_stm24.patch \
+		linux-squashfs-downgrade-stm24-2.6.25.patch \
+		linux-squashfs-downgrade-stm24-rm_d_alloc_anon.patch
 
 TF7700_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-tf7700_setup_stm24_$(KERNEL_LABEL).patch \
@@ -86,19 +89,15 @@ OCTAGON1008_PATCHES_24 = $(COMMON_PATCHES_24) \
 ATEVIO7500_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-lmb_stm24_$(KERNEL_LABEL).patch \
 		linux-sh4-atevio7500_setup_stm24_$(KERNEL_LABEL).patch \
+		$(if $(ENIGMA2),linux-sh4-atevio7500_mtdconcat_stm24_$(KERNEL_LABEL).patch) \
 		linux-sh4-stmmac_stm24_$(KERNEL_LABEL).patch
-ifeq ($(IMAGE), $(filter $(IMAGE), enigma2 enigma2-wlandriver))
-ATEVIO7500_PATCHES_24 += linux-sh4-atevio7500_mtdconcat_stm24_$(KERNEL_LABEL).patch
-endif
 
 HS7110_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-lmb_stm24_$(KERNEL_LABEL).patch \
 		linux-sh4-hs7110_setup_stm24_$(KERNEL_LABEL).patch \
+		$(if $(NEUTRINO),linux-sh4-hs7110_mtdconcat_stm24_$(KERNEL_LABEL).patch) \
 		linux-sh4-stmmac_stm24_$(KERNEL_LABEL).patch \
 		$(if $(P0209),linux-sh4-i2c-stm-downgrade_stm24_$(KERNEL_LABEL).patch)
-ifeq ($(IMAGE), $(filter $(IMAGE), neutrino neutrino-wlandriver))
-HS7110_PATCHES_24 += linux-sh4-hs7110_mtdconcat_stm24_$(KERNEL_LABEL).patch
-endif
 
 HS7119_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-lmb_stm24_$(KERNEL_LABEL).patch \
@@ -109,11 +108,9 @@ HS7119_PATCHES_24 = $(COMMON_PATCHES_24) \
 HS7420_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-lmb_stm24_$(KERNEL_LABEL).patch \
 		linux-sh4-hs7420_setup_stm24_$(KERNEL_LABEL).patch \
+		$(if $(NEUTRINO),linux-sh4-hs7420_mtdconcat_stm24_$(KERNEL_LABEL).patch) \
 		linux-sh4-stmmac_stm24_$(KERNEL_LABEL).patch \
 		$(if $(P0209),linux-sh4-i2c-stm-downgrade_stm24_$(KERNEL_LABEL).patch)
-ifeq ($(IMAGE), $(filter $(IMAGE), neutrino neutrino-wlandriver))
-HS7420_PATCHES_24 += linux-sh4-hs7420_mtdconcat_stm24_$(KERNEL_LABEL).patch
-endif
 
 HS7429_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-lmb_stm24_$(KERNEL_LABEL).patch \
@@ -124,11 +121,9 @@ HS7429_PATCHES_24 = $(COMMON_PATCHES_24) \
 HS7810A_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-lmb_stm24_$(KERNEL_LABEL).patch \
 		linux-sh4-hs7810a_setup_stm24_$(KERNEL_LABEL).patch \
+		$(if $(NEUTRINO),linux-sh4-hs7810a_mtdconcat_stm24_$(KERNEL_LABEL).patch) \
 		linux-sh4-stmmac_stm24_$(KERNEL_LABEL).patch \
 		$(if $(P0209),linux-sh4-i2c-stm-downgrade_stm24_$(KERNEL_LABEL).patch)
-ifeq ($(IMAGE), $(filter $(IMAGE), neutrino neutrino-wlandriver))
-HS7810A_PATCHES_24 += linux-sh4-hs7810a_mtdconcat_stm24_$(KERNEL_LABEL).patch
-endif
 
 HS7819_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-lmb_stm24_$(KERNEL_LABEL).patch \
@@ -140,21 +135,13 @@ ATEMIO520_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-stmmac_stm24_$(KERNEL_LABEL).patch \
 		linux-sh4-lmb_stm24_$(KERNEL_LABEL).patch \
 		linux-sh4-atemio520_setup_stm24_$(KERNEL_LABEL).patch \
-		$(if $(P0209),linux-sh4-i2c-stm-downgrade_stm24_$(KERNEL_LABEL).patch) \
-		linux-squashfs-downgrade-stm24_$(KERNEL_LABEL)-to-stm23.patch \
-		linux-squashfs3.0_lzma_stm23.patch \
-		linux-squashfs-downgrade-stm24-patch-2.6.25 \
-		linux-squashfs-downgrade-stm24-rm_d_alloc_anon.patch
+		$(if $(P0209),linux-sh4-i2c-stm-downgrade_stm24_$(KERNEL_LABEL).patch)
 
 ATEMIO530_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-stmmac_stm24_$(KERNEL_LABEL).patch \
 		linux-sh4-lmb_stm24_$(KERNEL_LABEL).patch \
 		linux-sh4-atemio530_setup_stm24_$(KERNEL_LABEL).patch \
-		$(if $(P0209),linux-sh4-i2c-stm-downgrade_stm24_$(KERNEL_LABEL).patch) \
-		linux-squashfs-downgrade-stm24_$(KERNEL_LABEL)-to-stm23.patch \
-		linux-squashfs3.0_lzma_stm23.patch \
-		linux-squashfs-downgrade-stm24-patch-2.6.25 \
-		linux-squashfs-downgrade-stm24-rm_d_alloc_anon.patch
+		$(if $(P0209),linux-sh4-i2c-stm-downgrade_stm24_$(KERNEL_LABEL).patch)
 
 UFS922_PATCHES_24 = $(COMMON_PATCHES_24) \
 		linux-sh4-ufs922_setup_stm24_$(KERNEL_LABEL).patch \
@@ -309,7 +296,7 @@ ifeq ($(OPTIMIZATIONS), $(filter $(OPTIMIZATIONS), kerneldebug debug))
 	@echo "CONFIG_PRINTK=y" >> $(KERNEL_DIR)/.config
 	@echo "CONFIG_PRINTK_TIME=y" >> $(KERNEL_DIR)/.config
 endif
-ifeq ($(IMAGE), $(filter $(IMAGE), enigma2-wlandriver neutrino-wlandriver))
+ifeq ($(IMAGE), $(filter $(IMAGE), enigma2-wlandriver neutrino-wlandriver titan-wlandriver))
 	@echo "Using kernel wireless"
 	@grep -v "CONFIG_WIRELESS" "$(KERNEL_DIR)/.config" > $(KERNEL_DIR)/.config.tmp
 	cp $(KERNEL_DIR)/.config.tmp $(KERNEL_DIR)/.config

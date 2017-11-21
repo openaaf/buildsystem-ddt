@@ -1453,6 +1453,11 @@ FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
 endif
 
+ifeq ($(IMAGE), titan)
+FFMPEG_CONF_OPTS  = --enable-librtmp
+LIBRTMPDUMP = $(D)/librtmpdump
+endif
+
 ifeq ($(IMAGE), neutrino)
 FFMPEG_CONF_OPTS = --disable-iconv
 endif
@@ -1568,6 +1573,9 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(D)/libroxml $(
 			--enable-decoder=pcm_s16be_planar \
 			--enable-decoder=pgssub \
 			--enable-decoder=png \
+			--enable-decoder=ra_144 \
+			--enable-decoder=ra_288 \
+			--enable-decoder=rawvideo \
 			--enable-decoder=srt \
 			--enable-decoder=subrip \
 			--enable-decoder=subviewer \
@@ -1577,6 +1585,10 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(D)/libroxml $(
 			--enable-decoder=vorbis \
 			--enable-decoder=wmv3 \
 			--enable-decoder=xsub \
+			--enable-decoder=wmapro \
+			--enable-decoder=wmav1 \
+			--enable-decoder=wmav2 \
+			--enable-decoder=wmavoice \
 			\
 			--disable-demuxers \
 			--enable-demuxer=aac \

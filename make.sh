@@ -242,13 +242,15 @@ echo "MEDIAFW=$MEDIAFW" >> config
 ##############################################
 
 case $5 in
-	[1-4]) REPLY=$5;;
+	[1-6]) REPLY=$5;;
 	*)	echo -e "\nWhich Image do you want to build:"
 		echo "   1)  Enigma2"
 		echo "   2)  Enigma2  (includes WLAN drivers)"
 		echo "   3)  Neutrino"
 		echo "   4)  Neutrino (includes WLAN drivers)"
-		read -p "Select Image to build (1-4)? ";;
+		echo "   5)  Titan"
+		echo "   6)  Titan (includes WLAN drivers)"
+		read -p "Select Image to build (1-6)? ";;
 esac
 
 case "$REPLY" in
@@ -256,6 +258,8 @@ case "$REPLY" in
 	2) IMAGE="enigma2-wlandriver";;
 	3) IMAGE="neutrino";;
 	4) IMAGE="neutrino-wlandriver";;
+	5) IMAGE="titan";;
+	6) IMAGE="titan-wlandriver";;
 	*) IMAGE="neutrino";;
 esac
 echo "IMAGE=$IMAGE" >> config
@@ -280,6 +284,8 @@ case "$IMAGE" in
 		echo "  make yaud-neutrino-hd2-plugins";;
 		enigma2*)
 		echo "  make yaud-enigma2";;
+		titan*)
+		echo "  make yaud-titan";;
 		*)
 		echo "  make flashimage"
 		echo "  make ofgimage";;
