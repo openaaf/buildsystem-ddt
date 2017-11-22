@@ -505,8 +505,10 @@ release_titan_arivalink200:
 release_titan_base:
 	rm -rf $(RELEASE_DIR) || true
 	install -d $(RELEASE_DIR)
-	install -d $(RELEASE_DIR)/{bin,boot,dev,dev.static,etc,hdd,lib,media,mnt,proc,ram,root,sbin,swap,sys,tmp,usr,var}
-	install -d $(RELEASE_DIR)/etc/{init.d,network,mdev}
+#	install -d $(RELEASE_DIR)/{bin,boot,dev,dev.static,etc,hdd,lib,media,mnt,proc,ram,root,sbin,swap,sys,tmp,usr,var}
+	install -d $(RELEASE_DIR)/{autofs,bin,boot,dev,dev.static,etc,hdd,home,lib,media,mnt,proc,ram,root,sbin,swap,sys,tmp,usr,var}
+#	install -d $(RELEASE_DIR)/etc/{init.d,network,mdev}
+	install -d $(RELEASE_DIR)/etc/{init.d,network,mdev,ssl}
 	install -d $(RELEASE_DIR)/etc/network/if-{post-{up,down},pre-{up,down},up,down}.d
 	install -d $(RELEASE_DIR)/lib/{modules,udev,firmware}
 	install -d $(RELEASE_DIR)/media/{dvd,nfs,usb,sda1,sdb1}
@@ -518,7 +520,9 @@ release_titan_base:
 	ln -sf /usr/share $(RELEASE_DIR)/share
 	install -d $(RELEASE_DIR)/var/{bin,boot,etc,lib,update}
 	install -d $(RELEASE_DIR)/var/lib/nfs
+ifneq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
 	export CROSS_COMPILE=$(TARGET)- && $(MAKE) install -C $(BUILD_TMP)/busybox-$(BUSYBOX_VER) CONFIG_PREFIX=$(RELEASE_DIR)
+endif
 #	remove the slink to busybox
 	rm -f $(RELEASE_DIR)/sbin/halt
 	cp -f $(TARGET_DIR)/sbin/halt $(RELEASE_DIR)/sbin/
@@ -533,8 +537,15 @@ release_titan_base:
 	ln -s ../init.d/umountfs $(RELEASE_DIR)/etc/rc.d/rc6.d/S40umountfs
 	ln -s ../init.d/reboot $(RELEASE_DIR)/etc/rc.d/rc6.d/S90reboot
 	touch $(RELEASE_DIR)/var/etc/.firstboot
+ifneq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
 	cp -a $(TARGET_DIR)/bin/* $(RELEASE_DIR)/bin/
 	cp -a $(TARGET_DIR)/sbin/* $(RELEASE_DIR)/sbin/
+else
+	cp -a $(TARGET_DIR)/bin/* $(RELEASE_DIR)/bin/
+	cp -a $(TARGET_DIR)/usr/bin/* $(RELEASE_DIR)/usr/bin/
+	cp -a $(TARGET_DIR)/sbin/* $(RELEASE_DIR)/sbin/
+	cp -a $(TARGET_DIR)/usr/sbin/* $(RELEASE_DIR)/usr/sbin/
+endif
 	ln -sf /bin/showiframe $(RELEASE_DIR)/usr/bin/showiframe
 	cp $(TARGET_DIR)/boot/uImage $(RELEASE_DIR)/boot/
 	ln -sf /proc/mounts $(RELEASE_DIR)/etc/mtab
@@ -552,7 +563,7 @@ release_titan_base:
 	cp -dp $(TARGET_DIR)/usr/bin/vsftpd $(RELEASE_DIR)/usr/bin/
 #	cp -dp $(TARGET_DIR)/usr/bin/irexec $(RELEASE_DIR)/usr/bin/
 #	cp -p $(TARGET_DIR)/usr/bin/ffmpeg $(RELEASE_DIR)/sbin/
-	cp -p $(TARGET_DIR)/sbin/ffmpeg $(RELEASE_DIR)/sbin/
+#	cp -p $(TARGET_DIR)/sbin/ffmpeg $(RELEASE_DIR)/sbin/
 	cp -aR $(TARGET_DIR)/etc/init.d/* $(RELEASE_DIR)/etc/init.d/
 	cp -aR $(TARGET_DIR)/etc/* $(RELEASE_DIR)/etc/
 	ln -sf ../../bin/busybox $(RELEASE_DIR)/usr/bin/ether-wake
@@ -740,11 +751,14 @@ endif
 	fi
 #
 # autofs
-#
+
+#ifneq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
 #	if [ -d $(RELEASE_DIR)/usr/lib/autofs ]; then \
 #		cp -f $(TARGET_DIR)/usr/sbin/automount $(RELEASE_DIR)/usr/sbin/; \
 #		ln -s /usr/sbin/automount $(RELEASE_DIR)/sbin/automount; \
 #	fi
+#endif
+
 #
 # graphlcd
 #
