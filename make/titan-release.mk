@@ -81,8 +81,9 @@ release_titan_common_ipbox:
 	cp -f $(SKEL_ROOT)/release/fstab_ipbox $(RELEASE_DIR)/etc/fstab
 	cp $(SKEL_ROOT)/boot/video_7109.elf $(RELEASE_DIR)/lib/firmware/video.elf
 	cp $(SKEL_ROOT)/boot/audio_7100.elf $(RELEASE_DIR)/lib/firmware/audio.elf
+	mkdir -p $(RELEASE_DIR)/var/run/lirc
 	cp -dp $(SKEL_ROOT)/release/lircd_ipbox.conf $(RELEASE_DIR)/etc/lircd.conf
-	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
 	rm -f $(RELEASE_DIR)/lib/firmware/*
 	rm -f $(RELEASE_DIR)/lib/modules/boxtype.ko
 	rm -f $(RELEASE_DIR)/lib/modules/bpamem.ko
@@ -129,8 +130,9 @@ release_titan_ufs910:
 	cp $(SKEL_ROOT)/boot/video_7100.elf $(RELEASE_DIR)/lib/firmware/video.elf
 	cp $(SKEL_ROOT)/boot/audio_7100.elf $(RELEASE_DIR)/lib/firmware/audio.elf
 	cp $(SKEL_ROOT)/firmware/dvb-fe-cx21143.fw $(RELEASE_DIR)/lib/firmware/dvb-fe-cx24116.fw
+	mkdir -p $(RELEASE_DIR)/var/run/lirc
 	cp -dp $(SKEL_ROOT)/release/lircd_ufs910.conf $(RELEASE_DIR)/etc/lircd.conf
-	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
 	rm -f $(RELEASE_DIR)/bin/vdstandby
 
 #
@@ -205,8 +207,9 @@ release_titan_spark:
 	cp $(SKEL_ROOT)/boot/audio_7111.elf $(RELEASE_DIR)/lib/firmware/audio.elf
 	cp $(SKEL_ROOT)/firmware/component_7111_mb618.fw $(RELEASE_DIR)/lib/firmware/component.fw
 	rm -f $(RELEASE_DIR)/bin/vdstandby
+	mkdir -p $(RELEASE_DIR)/var/run/lirc
 	cp -dp $(SKEL_ROOT)/release/lircd_spark.conf $(RELEASE_DIR)/etc/lircd.conf
-	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
 
 #
 # release_spark7162
@@ -222,8 +225,9 @@ release_titan_spark7162:
 	cp $(SKEL_ROOT)/boot/audio_7105.elf $(RELEASE_DIR)/lib/firmware/audio.elf
 	cp $(SKEL_ROOT)/firmware/component_7105_pdk7105.fw $(RELEASE_DIR)/lib/firmware/component.fw
 	rm -f $(RELEASE_DIR)/bin/vdstandby
+	mkdir -p $(RELEASE_DIR)/var/run/lirc
 	cp -dp $(SKEL_ROOT)/release/lircd_spark7162.conf $(RELEASE_DIR)/etc/lircd.conf
-	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
 
 #
 # release_fortis_hdbox
@@ -395,8 +399,9 @@ release_titan_hl101:
 	cp $(SKEL_ROOT)/boot/audio_7109.elf $(RELEASE_DIR)/lib/firmware/audio.elf
 	cp $(SKEL_ROOT)/firmware/dvb-fe-avl2108.fw $(RELEASE_DIR)/lib/firmware/
 	cp $(SKEL_ROOT)/firmware/dvb-fe-stv6306.fw $(RELEASE_DIR)/lib/firmware/
+	mkdir -p $(RELEASE_DIR)/var/run/lirc
 	cp -dp $(SKEL_ROOT)/release/lircd_hl101.conf $(RELEASE_DIR)/etc/lircd.conf
-	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
 
 #
 # release_adb_box
@@ -417,8 +422,9 @@ release_titan_adb_box:
 	cp $(SKEL_ROOT)/firmware/dvb-fe-avl2108.fw $(RELEASE_DIR)/lib/firmware/
 	cp $(SKEL_ROOT)/firmware/dvb-fe-avl6222.fw $(RELEASE_DIR)/lib/firmware/
 	cp -f $(SKEL_ROOT)/release/fstab_adb_box $(RELEASE_DIR)/etc/fstab
+	mkdir -p $(RELEASE_DIR)/var/run/lirc
 	cp -dp $(SKEL_ROOT)/release/lircd_adb_box.conf $(RELEASE_DIR)/etc/lircd.conf
-	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/lircd
+#	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/lircd
 
 #
 # release_tf7700
@@ -462,12 +468,13 @@ release_titan_sagemcom88:
 	cp $(SKEL_ROOT)/boot/audio_7105.elf $(RELEASE_DIR)/lib/firmware/audio.elf
 	cp $(SKEL_ROOT)/firmware/dvb-fe-avl6222.fw $(RELEASE_DIR)/lib/firmware/
 	cp $(SKEL_ROOT)/firmware/component_7105_pdk7105.fw $(RELEASE_DIR)/lib/firmware/component.fw
-	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
-	cp -p $(TARGET_DIR)/usr/sbin/lircmd $(RELEASE_DIR)/usr/bin/
+	mkdir -p $(RELEASE_DIR)/var/run/lirc
+#	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/sbin/lircmd $(RELEASE_DIR)/usr/bin/
 #	cp -p $(TARGET_DIR)/usr/bin/irexec $(RELEASE_DIR)/usr/bin/
-	cp -p $(TARGET_DIR)/usr/bin/irrecord $(RELEASE_DIR)/usr/bin/
-	cp -p $(TARGET_DIR)/usr/bin/irsend $(RELEASE_DIR)/usr/bin/
-	cp -p $(TARGET_DIR)/usr/bin/irw $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/bin/irrecord $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/bin/irsend $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/bin/irw $(RELEASE_DIR)/usr/bin/
 	cp -dp $(SKEL_ROOT)/release/lircd_sagemcom88.conf $(RELEASE_DIR)/etc/lircd.conf
 
 #
@@ -482,12 +489,13 @@ release_titan_arivalink200:
 	cp $(SKEL_ROOT)/boot/audio_7100.elf $(RELEASE_DIR)/lib/firmware/audio.elf
 	cp $(SKEL_ROOT)/firmware/dvb-fe-avl6222.fw $(RELEASE_DIR)/lib/firmware/
 	cp $(SKEL_ROOT)/firmware/dvb-fe-cx24116.fw $(RELEASE_DIR)/lib/firmware/
-	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
-	cp -p $(TARGET_DIR)/usr/sbin/lircmd $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/sbin/lircd $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/sbin/lircmd $(RELEASE_DIR)/usr/bin/
 #	cp -p $(TARGET_DIR)/usr/bin/irexec $(RELEASE_DIR)/usr/bin/
-	cp -p $(TARGET_DIR)/usr/bin/irrecord $(RELEASE_DIR)/usr/bin/
-	cp -p $(TARGET_DIR)/usr/bin/irsend $(RELEASE_DIR)/usr/bin/
-	cp -p $(TARGET_DIR)/usr/bin/irw $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/bin/irrecord $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/bin/irsend $(RELEASE_DIR)/usr/bin/
+#	cp -p $(TARGET_DIR)/usr/bin/irw $(RELEASE_DIR)/usr/bin/
+	mkdir -p $(RELEASE_DIR)/var/run/lirc
 	cp -dp $(SKEL_ROOT)/release/lircd_arivalink200.conf $(RELEASE_DIR)/etc/lircd.conf
 
 #
