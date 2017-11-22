@@ -518,7 +518,7 @@ release_titan_base:
 	ln -sf /usr/share $(RELEASE_DIR)/share
 	install -d $(RELEASE_DIR)/var/{bin,boot,etc,lib,update}
 	install -d $(RELEASE_DIR)/var/lib/nfs
-#	export CROSS_COMPILE=$(TARGET)- && $(MAKE) install -C $(BUILD_TMP)/busybox-$(BUSYBOX_VER) CONFIG_PREFIX=$(RELEASE_DIR)
+	export CROSS_COMPILE=$(TARGET)- && $(MAKE) install -C $(BUILD_TMP)/busybox-$(BUSYBOX_VER) CONFIG_PREFIX=$(RELEASE_DIR)
 #	remove the slink to busybox
 	rm -f $(RELEASE_DIR)/sbin/halt
 	cp -f $(TARGET_DIR)/sbin/halt $(RELEASE_DIR)/sbin/
