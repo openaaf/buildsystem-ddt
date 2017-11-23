@@ -752,12 +752,12 @@ endif
 #
 # autofs
 
-#ifneq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-#	if [ -d $(RELEASE_DIR)/usr/lib/autofs ]; then \
-#		cp -f $(TARGET_DIR)/usr/sbin/automount $(RELEASE_DIR)/usr/sbin/; \
+ifneq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+	if [ -d $(RELEASE_DIR)/usr/lib/autofs ]; then \
+		cp -f $(TARGET_DIR)/usr/sbin/automount $(RELEASE_DIR)/usr/sbin/; \
 #		ln -s /usr/sbin/automount $(RELEASE_DIR)/sbin/automount; \
-#	fi
-#endif
+	fi
+endif
 
 #
 # graphlcd
