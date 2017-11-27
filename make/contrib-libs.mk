@@ -1456,9 +1456,9 @@ ifeq ($(IMAGE), enigma2)
 FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN += $(D)/libroxml $(D)/libxml2
+FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
 else
-FFMPEG_EXTERN += $(D)/libroxml
+FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
 FFMPEG_CONF_OPTS  += --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto --disable-protocol=data
 FFMPEG_CONF_OPTS  += --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls --disable-protocol=httpproxy 
@@ -1472,9 +1472,9 @@ FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
 
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN += $(D)/libroxml $(D)/libxml2
+FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
 else
-FFMPEG_EXTERN += $(D)/libroxml
+FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
 FFMPEG_CONF_OPTS  += --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto --disable-protocol=data
 FFMPEG_CONF_OPTS  += --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls --disable-protocol=httpproxy 
@@ -1487,9 +1487,9 @@ endif
 ifeq ($(IMAGE), neutrino)
 FFMPEG_CONF_OPTS = --disable-iconv
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN += $(D)/libroxml $(D)/libxml2
+FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
 else
-FFMPEG_EXTERN += $(D)/libroxml
+FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
 FFMPEG_CONF_OPTS  += --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto --disable-protocol=data
 FFMPEG_CONF_OPTS  += --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls --disable-protocol=httpproxy 
