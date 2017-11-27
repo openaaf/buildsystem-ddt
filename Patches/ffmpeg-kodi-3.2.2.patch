@@ -86,8 +86,7 @@ Subject: [PATCH 03/13] added: Ticket #7187, TV Teletext support for DVB EBU
 
 ---
  libavcodec/avcodec.h | 4 ++++
- libavformat/mpegts.c | 2 ++
- 2 files changed, 6 insertions(+)
+ 1 files changed, 6 insertions(+)
 
 diff --git a/libavcodec/avcodec.h b/libavcodec/avcodec.h
 index 9d38b59..bc1b1b9 100644
@@ -104,197 +103,6 @@ index 9d38b59..bc1b1b9 100644
      /* other specific kind of codecs (generally used for attachments) */
      AV_CODEC_ID_FIRST_UNKNOWN = 0x18000,           ///< A dummy ID pointing at the start of various fake codecs.
      AV_CODEC_ID_TTF = 0x18000,
-diff --git a/libavformat/mpegts.c b/libavformat/mpegts.c
-index 65824dd..338861e 100644
---- a/libavformat/mpegts.c
-+++ b/libavformat/mpegts.c
-@@ -756,6 +756,8 @@ static const StreamType DESC_types[] = {
-     { 0x7b, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS          },
-     { 0x56, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_TELETEXT },
-     { 0x59, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_SUBTITLE }, /* subtitling descriptor */
-+    { 0x45, AVMEDIA_TYPE_DATA,         AV_CODEC_ID_VBI_DATA }, /* VBI Data descriptor */
-+    { 0x46, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_VBI_TELETEXT }, /* VBI Teletext descriptor */
-     { 0 },
- };
- 
-
-From fabf7216626da8caecf9cb34b188739e530cc8d4 Mon Sep 17 00:00:00 2001
-From: Joakim Plate <elupus@ecce.se>
-Date: Sun, 18 Sep 2011 19:16:34 +0200
-Subject: [PATCH 04/13] Don't accept mpegts PMT that isn't current
-
----
- libavformat/mpegts.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/libavformat/mpegts.c b/libavformat/mpegts.c
-index 338861e..d4168c8 100644
---- a/libavformat/mpegts.c
-+++ b/libavformat/mpegts.c
-@@ -585,6 +585,7 @@ typedef struct SectionHeader {
-     uint8_t tid;
-     uint16_t id;
-     uint8_t version;
-+    uint8_t current;
-     uint8_t sec_num;
-     uint8_t last_sec_num;
- } SectionHeader;
-@@ -667,6 +668,7 @@ static int parse_section_header(SectionHeader *h,
-     val = get8(pp, p_end);
-     if (val < 0)
-         return val;
-+    h->current = val & 0x1;
-     h->version = (val >> 1) & 0x1f;
-     val = get8(pp, p_end);
-     if (val < 0)
-@@ -2023,6 +2025,8 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
-         return;
-     if (ts->skip_changes)
-         return;
-+    if (!h->current)
-+        return;
- 
-     if (skip_identical(h, tssf))
-         return;
-
-From 4f1d8668a50ebf7cddc03d191c72c36fca2146dc Mon Sep 17 00:00:00 2001
-From: Joakim Plate <elupus@ecce.se>
-Date: Sun, 18 Sep 2011 19:17:23 +0200
-Subject: [PATCH 05/13] Don't reparse PMT unless it's version has changed
-
----
- libavformat/mpegts.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/libavformat/mpegts.c b/libavformat/mpegts.c
-index d4168c8..9c6f6dc 100644
---- a/libavformat/mpegts.c
-+++ b/libavformat/mpegts.c
-@@ -91,6 +91,7 @@ struct MpegTSFilter {
-     int es_id;
-     int last_cc; /* last cc code (-1 if first packet) */
-     int64_t last_pcr;
-+    int last_version; /* last version of data on this pid */
-     enum MpegTSFilterType type;
-     union {
-         MpegTSPESFilter pes_filter;
-@@ -459,6 +460,7 @@ static MpegTSFilter *mpegts_open_filter(MpegTSContext *ts, unsigned int pid,
-     filter->es_id   = -1;
-     filter->last_cc = -1;
-     filter->last_pcr= -1;
-+    filter->last_version = -1;
- 
-     return filter;
- }
-@@ -2027,6 +2029,10 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
-         return;
-     if (!h->current)
-         return;
-+    if (h->version == filter->last_version)
-+        return;
-+    filter->last_version = h->version;
-+    av_dlog(ts->stream, "version=%d\n", filter->last_version);
- 
-     if (skip_identical(h, tssf))
-         return;
-
-From 72cf6cb34af9de7e81bffc6a53f7d1f450e5b624 Mon Sep 17 00:00:00 2001
-From: Cory Fields <theuni-nospam-@xbmc.org>
-Date: Fri, 9 Jul 2010 16:43:31 -0400
-Subject: [PATCH 06/13] Read PID timestamps as well as PCR timestamps to find
- location in mpegts stream
-
----
- libavformat/mpegts.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 46 insertions(+), 2 deletions(-)
-
-diff --git a/libavformat/mpegts.c b/libavformat/mpegts.c
-index 9c6f6dc..a4db558 100644
---- a/libavformat/mpegts.c
-+++ b/libavformat/mpegts.c
-@@ -2522,6 +2522,44 @@ static void seek_back(AVFormatContext *s, AVIOContext *pb, int64_t pos) {
-         av_log(s, pb->seekable ? AV_LOG_ERROR : AV_LOG_INFO, "Unable to seek back to the start\n");
- }
- 
-+static int parse_timestamp(int64_t *ts, const uint8_t *buf)
-+{
-+    int afc, flags;
-+    const uint8_t *p;
-+
-+    if(!(buf[1] & 0x40)) /* must be a start packet */
-+        return -1;
-+
-+    afc = (buf[3] >> 4) & 3;
-+    p = buf + 4;
-+    if (afc == 0 || afc == 2) /* invalid or only adaption field */
-+        return -1;
-+    if (afc == 3)
-+        p += p[0] + 1;
-+    if (p >= buf + TS_PACKET_SIZE)
-+        return -1;
-+
-+    if (p[0] != 0x00 || p[1] != 0x00 || p[2] != 0x01)  /* packet_start_code_prefix */
-+        return -1;
-+
-+    flags = p[3] | 0x100; /* stream type */
-+    if (!((flags >= 0x1c0 && flags <= 0x1df) ||
-+          (flags >= 0x1e0 && flags <= 0x1ef) ||
-+          (flags == 0x1bd) || (flags == 0x1fd)))
-+        return -1;
-+
-+    flags = p[7];
-+    if ((flags & 0xc0) == 0x80) {
-+        *ts = ff_parse_pes_pts(p+9);
-+        return 0;
-+    } else if ((flags & 0xc0) == 0xc0) {
-+        *ts = ff_parse_pes_pts(p+9+5);
-+        return 0;
-+    }
-+    return -1;
-+}
-+
-+
- static int mpegts_read_header(AVFormatContext *s)
- {
-     MpegTSContext *ts = s->priv_data;
-@@ -2736,6 +2774,7 @@ static av_unused int64_t mpegts_get_pcr(AVFormatContext *s, int stream_index,
-     uint8_t buf[TS_PACKET_SIZE];
-     int pcr_l, pcr_pid =
-         ((PESContext *)s->streams[stream_index]->priv_data)->pcr_pid;
-+    int pid = ((PESContext*)s->streams[stream_index]->priv_data)->pid;
-     int pos47 = ts->pos47_full % ts->raw_packet_size;
-     pos =
-         ((*ppos + ts->raw_packet_size - 1 - pos47) / ts->raw_packet_size) *
-@@ -2757,6 +2796,11 @@ static av_unused int64_t mpegts_get_pcr(AVFormatContext *s, int stream_index,
-             *ppos = pos;
-             return timestamp;
-         }
-+        if ((pid < 0 || (AV_RB16(buf + 1) & 0x1fff) == pid) &&
-+            parse_timestamp(&timestamp, buf) == 0) {
-+            *ppos = pos;
-+            return timestamp;
-+        }
-         pos += ts->raw_packet_size;
-     }
- 
-@@ -2856,7 +2900,7 @@ AVInputFormat ff_mpegts_demuxer = {
-     .read_header    = mpegts_read_header,
-     .read_packet    = mpegts_read_packet,
-     .read_close     = mpegts_read_close,
--    .read_timestamp = mpegts_get_dts,
-+    .read_timestamp = mpegts_get_pcr,
-     .flags          = AVFMT_SHOW_IDS | AVFMT_TS_DISCONT,
-     .priv_class     = &mpegts_class,
- };
-@@ -2868,7 +2912,7 @@ AVInputFormat ff_mpegtsraw_demuxer = {
-     .read_header    = mpegts_read_header,
-     .read_packet    = mpegts_raw_read_packet,
-     .read_close     = mpegts_read_close,
--    .read_timestamp = mpegts_get_dts,
-+    .read_timestamp = mpegts_get_pcr,
-     .flags          = AVFMT_SHOW_IDS | AVFMT_TS_DISCONT,
-     .priv_class     = &mpegtsraw_class,
- };
 
 From ee8a688e4e6f59785180c1e92981ff867f6f5c23 Mon Sep 17 00:00:00 2001
 From: Joakim Plate <elupus@ecce.se>
@@ -389,56 +197,64 @@ index 4ce4e2d..2c364ac 100644
                  best_dts = dts;
                  *st = avst;
 
-From c3e8fbd02c2eaba2a5d14d2b6c07fe08746f5947 Mon Sep 17 00:00:00 2001
-From: Joakim Plate <elupus@ecce.se>
-Date: Fri, 26 Nov 2010 20:56:48 +0000
-Subject: [PATCH 09/13] fixed: memleak in mpegts demuxer on some malformed (??)
- mpegts files with too large pes packets
-
-at-visions sample file brokenStream.mpg
----
- libavformat/mpegts.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
 diff --git a/libavformat/mpegts.c b/libavformat/mpegts.c
-index a4db558..492d9c7 100644
---- a/libavformat/mpegts.c
-+++ b/libavformat/mpegts.c
-@@ -868,6 +868,10 @@ static void reset_pes_packet_state(PESContext *pes)
+index 492d9c7..29d58eb 100644
+--- a/libavformat/mpegts.c	2017-11-28 00:28:51.779939530 +0100
++++ b/libavformat/mpegts.c	2017-11-28 00:28:51.215929638 +0100
+@@ -91,6 +91,7 @@
+     int es_id;
+     int last_cc; /* last cc code (-1 if first packet) */
+     int64_t last_pcr;
++    int last_version; /* last version of data on this pid */
+     enum MpegTSFilterType type;
+     union {
+         MpegTSPESFilter pes_filter;
+@@ -460,6 +461,7 @@
+     filter->es_id   = -1;
+     filter->last_cc = -1;
+     filter->last_pcr= -1;
++    filter->last_version = -1;
  
- static void new_pes_packet(PESContext *pes, AVPacket *pkt)
+     return filter;
+ }
+@@ -587,6 +589,7 @@
+     uint8_t tid;
+     uint16_t id;
+     uint8_t version;
++    uint8_t current;
+     uint8_t sec_num;
+     uint8_t last_sec_num;
+ } SectionHeader;
+@@ -669,6 +672,7 @@
+     val = get8(pp, p_end);
+     if (val < 0)
+         return val;
++    h->current = val & 0x1;
+     h->version = (val >> 1) & 0x1f;
+     val = get8(pp, p_end);
+     if (val < 0)
+@@ -767,6 +771,8 @@
+     { 0x7b, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS          },
+     { 0x56, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_TELETEXT },
+     { 0x59, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_SUBTITLE }, /* subtitling descriptor */
++    { 0x45, AVMEDIA_TYPE_DATA,         AV_CODEC_ID_VBI_DATA }, /* VBI Data descriptor */
++    { 0x46, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_VBI_TELETEXT }, /* VBI Teletext descriptor */
+     { 0 },
+ };
+ 
+@@ -887,6 +893,11 @@
+ 
+ static int new_pes_packet(PESContext *pes, AVPacket *pkt)
  {
 +    if(pkt->data) {
 +      av_log(pes->stream, AV_LOG_ERROR, "ignoring previously allocated packet on stream %d\n", pkt->stream_index);
 +      av_free_packet(pkt);
 +    }
-     av_init_packet(pkt);
- 
-     pkt->buf  = pes->buffer;
-@@ -2727,6 +2731,8 @@ static int mpegts_read_packet(AVFormatContext *s, AVPacket *pkt)
- 
-     pkt->size = -1;
-     ts->pkt = pkt;
-+    ts->pkt->data = NULL;
 +
-     ret = handle_packets(ts, 0);
-     if (ret < 0) {
-         av_free_packet(ts->pkt);
-
-From eba5c839b7e24f8e6800d3f923d5334c2c9e6b2d Mon Sep 17 00:00:00 2001
-From: Joakim Plate <elupus@ecce.se>
-Date: Mon, 28 Jun 2010 21:26:54 +0000
-Subject: [PATCH 10/13] Speed up mpegts av_find_stream_info
-
----
- libavformat/mpegts.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/libavformat/mpegts.c b/libavformat/mpegts.c
-index 492d9c7..29d58eb 100644
---- a/libavformat/mpegts.c
-+++ b/libavformat/mpegts.c
-@@ -1030,7 +1030,7 @@ static int mpegts_push_data(MpegTSFilter *filter,
+     char *sd;
+ 
+     av_init_packet(pkt);
+@@ -1057,7 +1068,7 @@
                          goto skip;
  
                      /* stream not present in PMT */
@@ -447,16 +263,109 @@ index 492d9c7..29d58eb 100644
                          if (ts->skip_changes)
                              goto skip;
  
-From 959b88473b6f76fb2245f329ef604d2066b2cb89 Mon Sep 17 00:00:00 2001
-From: wsnipex <wsnipex@a1.net>
-Date: Mon, 16 Feb 2015 09:58:28 +0100
-Subject: [PATCH 12/13] only check for a git rev if the src tree is in a git
- repo
-
-fixes the version string when building from the kodi depends src tree
----
- version.sh | 36 +++++++++++++++++++-----------------
- 1 file changed, 19 insertions(+), 17 deletions(-)
+@@ -2104,6 +2115,12 @@
+         return;
+     if (ts->skip_changes)
+         return;
++    if (!h->current)
++        return;
++    if (h->version == filter->last_version)
++        return;
++    filter->last_version = h->version;
++    av_dlog(ts->stream, "version=%d\n", filter->last_version);
+ 
+     if (skip_identical(h, tssf))
+         return;
+@@ -2608,6 +2625,43 @@
+         av_log(s, pb->seekable ? AV_LOG_ERROR : AV_LOG_INFO, "Unable to seek back to the start\n");
+ }
+ 
++static int parse_timestamp(int64_t *ts, const uint8_t *buf)
++{
++    int afc, flags;
++    const uint8_t *p;
++
++    if(!(buf[1] & 0x40)) /* must be a start packet */
++        return -1;
++
++    afc = (buf[3] >> 4) & 3;
++    p = buf + 4;
++    if (afc == 0 || afc == 2) /* invalid or only adaption field */
++        return -1;
++    if (afc == 3)
++        p += p[0] + 1;
++    if (p >= buf + TS_PACKET_SIZE)
++        return -1;
++
++    if (p[0] != 0x00 || p[1] != 0x00 || p[2] != 0x01)  /* packet_start_code_prefix */
++        return -1;
++
++    flags = p[3] | 0x100; /* stream type */
++    if (!((flags >= 0x1c0 && flags <= 0x1df) ||
++          (flags >= 0x1e0 && flags <= 0x1ef) ||
++          (flags == 0x1bd) || (flags == 0x1fd)))
++        return -1;
++
++    flags = p[7];
++    if ((flags & 0xc0) == 0x80) {
++        *ts = ff_parse_pes_pts(p+9);
++        return 0;
++    } else if ((flags & 0xc0) == 0xc0) {
++        *ts = ff_parse_pes_pts(p+9+5);
++        return 0;
++    }
++    return -1;
++}
++
+ static int mpegts_read_header(AVFormatContext *s)
+ {
+     MpegTSContext *ts = s->priv_data;
+@@ -2770,6 +2824,7 @@
+ 
+     pkt->size = -1;
+     ts->pkt = pkt;
++    ts->pkt->data = NULL;
+     ret = handle_packets(ts, 0);
+     if (ret < 0) {
+         av_packet_unref(ts->pkt);
+@@ -2819,6 +2874,7 @@
+     uint8_t buf[TS_PACKET_SIZE];
+     int pcr_l, pcr_pid =
+         ((PESContext *)s->streams[stream_index]->priv_data)->pcr_pid;
++    int pid = ((PESContext*)s->streams[stream_index]->priv_data)->pid;
+     int pos47 = ts->pos47_full % ts->raw_packet_size;
+     pos =
+         ((*ppos + ts->raw_packet_size - 1 - pos47) / ts->raw_packet_size) *
+@@ -2839,6 +2895,11 @@
+             *ppos = pos;
+             return timestamp;
+         }
++        if ((pid < 0 || (AV_RB16(buf + 1) & 0x1fff) == pid) &&
++            parse_timestamp(&timestamp, buf) == 0) {
++            *ppos = pos;
++            return timestamp;
++        }
+         pos += ts->raw_packet_size;
+     }
+ 
+@@ -2940,7 +3001,7 @@
+     .read_header    = mpegts_read_header,
+     .read_packet    = mpegts_read_packet,
+     .read_close     = mpegts_read_close,
+-    .read_timestamp = mpegts_get_dts,
++    .read_timestamp = mpegts_get_pcr,
+     .flags          = AVFMT_SHOW_IDS | AVFMT_TS_DISCONT,
+     .priv_class     = &mpegts_class,
+ };
+@@ -2952,7 +3013,7 @@
+     .read_header    = mpegts_read_header,
+     .read_packet    = mpegts_raw_read_packet,
+     .read_close     = mpegts_read_close,
+-    .read_timestamp = mpegts_get_dts,
++    .read_timestamp = mpegts_get_pcr,
+     .flags          = AVFMT_SHOW_IDS | AVFMT_TS_DISCONT,
+     .priv_class     = &mpegtsraw_class,
+ };
 
 diff --git a/version.sh b/version.sh
 index f9754eb..cc23f80 100755
