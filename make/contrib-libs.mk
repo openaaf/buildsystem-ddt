@@ -1445,6 +1445,7 @@ FFMPEG_PATCH  = ffmpeg-buffer-size-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-hds-libroxml-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-aac-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-add-dash-demux-$(FFMPEG_VER).patch
 
 $(ARCHIVE)/$(FFMPEG_SOURCE):
 	$(WGET) http://www.ffmpeg.org/releases/$(FFMPEG_SOURCE)
