@@ -1460,10 +1460,10 @@ FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
 else
 FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
-FFMPEG_CONF_OPTS  += --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto --disable-protocol=data
-FFMPEG_CONF_OPTS  += --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls --disable-protocol=httpproxy 
-FFMPEG_CONF_OPTS  += --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp --disable-protocol=srtp 
-FFMPEG_CONF_OPTS  += --disable-protocol=subfile --disable-protocol=unix
+FFMPEG_CONF_OPTS  += --disable-filters --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto
+FFMPEG_CONF_OPTS  += --disable-protocol=data --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls
+FFMPEG_CONF_OPTS  += --disable-protocol=httpproxy --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp 
+FFMPEG_CONF_OPTS  += --disable-protocol=srtp --disable-protocol=subfile --disable-protocol=unix
 endif
 endif
 
@@ -1476,10 +1476,10 @@ FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
 else
 FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
-FFMPEG_CONF_OPTS  += --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto --disable-protocol=data
-FFMPEG_CONF_OPTS  += --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls --disable-protocol=httpproxy 
-FFMPEG_CONF_OPTS  += --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp --disable-protocol=srtp 
-FFMPEG_CONF_OPTS  += --disable-protocol=subfile --disable-protocol=unix
+FFMPEG_CONF_OPTS  += --disable-filters --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto
+FFMPEG_CONF_OPTS  += --disable-protocol=data --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls
+FFMPEG_CONF_OPTS  += --disable-protocol=httpproxy --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp 
+FFMPEG_CONF_OPTS  += --disable-protocol=srtp --disable-protocol=subfile --disable-protocol=unix
 endif
 
 endif
@@ -1491,10 +1491,10 @@ FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
 else
 FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
-FFMPEG_CONF_OPTS  += --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto --disable-protocol=data
-FFMPEG_CONF_OPTS  += --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls --disable-protocol=httpproxy 
-FFMPEG_CONF_OPTS  += --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp --disable-protocol=srtp 
-FFMPEG_CONF_OPTS  += --disable-protocol=subfile --disable-protocol=unix
+FFMPEG_CONF_OPTS  += --disable-filters --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto
+FFMPEG_CONF_OPTS  += --disable-protocol=data --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls
+FFMPEG_CONF_OPTS  += --disable-protocol=httpproxy --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp 
+FFMPEG_CONF_OPTS  += --disable-protocol=srtp --disable-protocol=subfile --disable-protocol=unix
 endif
 endif
 
@@ -1652,7 +1652,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-demuxer=vc1 \
 			--enable-demuxer=wav \
 			\
-			--disable-filters \
 			--enable-filter=scale \
 			\
 			--disable-xlib \
