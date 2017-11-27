@@ -1439,7 +1439,8 @@ $(D)/libdreamdvd: $(D)/bootstrap $(D)/libdvdnav
 #
 # ffmpeg
 #
-FFMPEG_VER = 2.8.10
+#FFMPEG_VER = 2.8.10
+FFMPEG_VER = 3.2.2
 FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VER).tar.xz
 FFMPEG_PATCH  = ffmpeg-buffer-size-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-hds-libroxml-$(FFMPEG_VER).patch
@@ -1617,6 +1618,7 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-demuxer=ac3 \
 			--enable-demuxer=avi \
 			--enable-demuxer=dts \
+			--enable-demuxer=dash \
 			--enable-demuxer=flac \
 			--enable-demuxer=flv \
 			--enable-demuxer=hds \
@@ -1872,7 +1874,7 @@ ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
 LIBXML2_CONF_OPTS  = --without-python
 ifeq ($(BOXARCH), sh4)
 LIBXML2_CONF_OPTS += --without-iconv
-LIBXML2_CONF_OPTS += --with-minimum
+#LIBXML2_CONF_OPTS += --with-minimum
 endif
 endif
 
