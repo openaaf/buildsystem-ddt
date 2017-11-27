@@ -1447,28 +1447,62 @@ FFMPEG_PATCH += ffmpeg-aac-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-add-dash-demux-$(FFMPEG_VER).patch
 
+
+
 $(ARCHIVE)/$(FFMPEG_SOURCE):
 	$(WGET) http://www.ffmpeg.org/releases/$(FFMPEG_SOURCE)
 
 ifeq ($(IMAGE), enigma2)
 FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+FFMPEG_EXTERN += $(D)/libroxml $(D)/libxml2
+else
+FFMPEG_EXTERN += $(D)/libroxml
+FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
+FFMPEG_CONF_OPTS  += --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto --disable-protocol=data
+FFMPEG_CONF_OPTS  += --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls --disable-protocol=httpproxy 
+FFMPEG_CONF_OPTS  += --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp --disable-protocol=srtp 
+FFMPEG_CONF_OPTS  += --disable-protocol=subfile --disable-protocol=unix
+endif
 endif
 
 ifeq ($(IMAGE), titan)
 FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
+
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+FFMPEG_EXTERN += $(D)/libroxml $(D)/libxml2
+else
+FFMPEG_EXTERN += $(D)/libroxml
+FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
+FFMPEG_CONF_OPTS  += --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto --disable-protocol=data
+FFMPEG_CONF_OPTS  += --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls --disable-protocol=httpproxy 
+FFMPEG_CONF_OPTS  += --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp --disable-protocol=srtp 
+FFMPEG_CONF_OPTS  += --disable-protocol=subfile --disable-protocol=unix
+endif
+
 endif
 
 ifeq ($(IMAGE), neutrino)
 FFMPEG_CONF_OPTS = --disable-iconv
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+FFMPEG_EXTERN += $(D)/libroxml $(D)/libxml2
+else
+FFMPEG_EXTERN += $(D)/libroxml
+FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
+FFMPEG_CONF_OPTS  += --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto --disable-protocol=data
+FFMPEG_CONF_OPTS  += --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls --disable-protocol=httpproxy 
+FFMPEG_CONF_OPTS  += --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp --disable-protocol=srtp 
+FFMPEG_CONF_OPTS  += --disable-protocol=subfile --disable-protocol=unix
+endif
 endif
 
 ifeq ($(BOXARCH), sh4)
 FFMPEG_CONF_OPTS += --disable-armv5te --disable-armv6 --disable-armv6t2
 endif
-
-$(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(D)/libroxml $(LIBRTMPDUMP) $(ARCHIVE)/$(FFMPEG_SOURCE)
+# $(D)/libroxml
+$(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN) $(LIBRTMPDUMP) $(ARCHIVE)/$(FFMPEG_SOURCE)
 	$(START_BUILD)
 	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
 	$(UNTAR)/$(FFMPEG_SOURCE)
@@ -1511,7 +1545,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(D)/libroxml $(
 			--disable-vaapi \
 			--disable-vdpau \
 			\
-			--disable-muxers \
 			--enable-muxer=flac \
 			--enable-muxer=mp3 \
 			--enable-muxer=h261 \
@@ -1523,7 +1556,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(D)/libroxml $(
 			--enable-muxer=mpegts \
 			--enable-muxer=ogg \
 			\
-			--disable-parsers \
 			--enable-parser=aac \
 			--enable-parser=aac_latm \
 			--enable-parser=ac3 \
@@ -1539,7 +1571,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(D)/libroxml $(
 			--enable-parser=vc1 \
 			--enable-parser=vorbis \
 			\
-			--disable-encoders \
 			--enable-encoder=aac \
 			--enable-encoder=h261 \
 			--enable-encoder=h263 \
@@ -1550,7 +1581,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(D)/libroxml $(
 			--enable-encoder=mpeg2video \
 			--enable-encoder=png \
 			\
-			--disable-decoders \
 			--enable-decoder=aac \
 			--enable-decoder=aac_latm \
 			--enable-decoder=dca \
@@ -1592,7 +1622,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(D)/libroxml $(
 			--enable-decoder=wmav2 \
 			--enable-decoder=wmavoice \
 			\
-			--disable-demuxers \
 			--enable-demuxer=aac \
 			--enable-demuxer=ac3 \
 			--enable-demuxer=avi \
@@ -1623,21 +1652,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(D)/libroxml $(
 			--enable-demuxer=vc1 \
 			--enable-demuxer=wav \
 			\
-			--disable-protocol=cache \
-			--disable-protocol=concat \
-			--disable-protocol=crypto \
-			--disable-protocol=data \
-			--disable-protocol=ftp \
-			--disable-protocol=gopher \
-			--disable-protocol=hls \
-			--disable-protocol=httpproxy \
-			--disable-protocol=md5 \
-			--disable-protocol=pipe \
-			--disable-protocol=sctp \
-			--disable-protocol=srtp \
-			--disable-protocol=subfile \
-			--disable-protocol=unix \
-			\
 			--disable-filters \
 			--enable-filter=scale \
 			\
@@ -1660,7 +1674,7 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(D)/libroxml $(
 			--disable-runtime-cpudetect \
 			--enable-cross-compile \
 			--cross-prefix=$(TARGET)- \
-			--extra-cflags="-I$(TARGET_DIR)/usr/include -ffunction-sections -fdata-sections" \
+			--extra-cflags="-I$(TARGET_DIR)/usr/include/libxml2 -I$(TARGET_DIR)/usr/include -ffunction-sections -fdata-sections" \
 			--extra-ldflags="-L$(TARGET_DIR)/usr/lib -Wl,--gc-sections,-lrt" \
 			--target-os=linux \
 			--arch=$(BOXARCH) \
@@ -1855,7 +1869,7 @@ LIBXML2_CONF_OPTS  = --with-python=$(HOST_DIR)
 LIBXML2_CONF_OPTS += --with-python-install-dir=/$(PYTHON_DIR)/site-packages
 endif
 
-ifeq ($(IMAGE), $(filter $(IMAGE), neutrino neutrino-wlandriver))
+ifeq ($(IMAGE), $(filter $(IMAGE), neutrino neutrino-wlandriver titan titan-wlandriver))
 LIBXML2_CONF_OPTS  = --without-python
 ifeq ($(BOXARCH), sh4)
 LIBXML2_CONF_OPTS += --without-iconv
@@ -1863,7 +1877,7 @@ LIBXML2_CONF_OPTS += --with-minimum
 endif
 endif
 
-$(D)/libxml2: $(D)/bootstrap $(D)/zlib $(ARCHIVE)/$(LIBXML2_SOURCE)
+$(D)/libxml2: $(D)/bootstrap $(D)/zlib $(D)/python $(ARCHIVE)/$(LIBXML2_SOURCE)
 	$(START_BUILD)
 	$(REMOVE)/libxml2-$(LIBXML2_VER).tar.gz
 	$(UNTAR)/$(LIBXML2_SOURCE)
