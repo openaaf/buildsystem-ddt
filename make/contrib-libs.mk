@@ -1447,17 +1447,12 @@ FFMPEG_PATCH += ffmpeg-aac-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-add-dash-demux-$(FFMPEG_VER).patch
 
-
-
 $(ARCHIVE)/$(FFMPEG_SOURCE):
 	$(WGET) http://www.ffmpeg.org/releases/$(FFMPEG_SOURCE)
 
 ifeq ($(IMAGE), enigma2)
 FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
-ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
-else
 FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
 FFMPEG_CONF_OPTS  += --disable-filters --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto
@@ -1465,14 +1460,13 @@ FFMPEG_CONF_OPTS  += --disable-protocol=data --disable-protocol=ftp --disable-pr
 FFMPEG_CONF_OPTS  += --disable-protocol=httpproxy --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp 
 FFMPEG_CONF_OPTS  += --disable-protocol=srtp --disable-protocol=subfile --disable-protocol=unix
 endif
-endif
 
-ifeq ($(IMAGE), titan)
+ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
 FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
 
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
+FFMPEG_EXTERN += $(D)/libroxml $(D)/libxml2
 else
 FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
@@ -1486,9 +1480,6 @@ endif
 
 ifeq ($(IMAGE), neutrino)
 FFMPEG_CONF_OPTS = --disable-iconv
-ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
-else
 FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
 FFMPEG_CONF_OPTS  += --disable-filters --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto
@@ -1496,11 +1487,11 @@ FFMPEG_CONF_OPTS  += --disable-protocol=data --disable-protocol=ftp --disable-pr
 FFMPEG_CONF_OPTS  += --disable-protocol=httpproxy --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp 
 FFMPEG_CONF_OPTS  += --disable-protocol=srtp --disable-protocol=subfile --disable-protocol=unix
 endif
-endif
 
 ifeq ($(BOXARCH), sh4)
 FFMPEG_CONF_OPTS += --disable-armv5te --disable-armv6 --disable-armv6t2
 endif
+
 # $(D)/libroxml
 $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN) $(LIBRTMPDUMP) $(ARCHIVE)/$(FFMPEG_SOURCE)
 	$(START_BUILD)
@@ -1864,11 +1855,12 @@ $(ARCHIVE)/$(LIBXML2_SOURCE):
 	$(WGET) ftp://xmlsoft.org/libxml2/$(LIBXML2_SOURCE)
 
 ifeq ($(IMAGE), $(filter $(IMAGE), enigma2 enigma2-wlandriver))
+LIBXML2_EXTERN = $(D)/python
 LIBXML2_CONF_OPTS  = --with-python=$(HOST_DIR)
 LIBXML2_CONF_OPTS += --with-python-install-dir=/$(PYTHON_DIR)/site-packages
 endif
 
-ifeq ($(IMAGE), $(filter $(IMAGE), neutrino neutrino-wlandriver titan titan-wlandriver))
+ifeq ($(IMAGE), $(filter $(IMAGE), neutrino neutrino-wlandriver))
 LIBXML2_CONF_OPTS  = --without-python
 ifeq ($(BOXARCH), sh4)
 LIBXML2_CONF_OPTS += --without-iconv
@@ -1876,7 +1868,15 @@ LIBXML2_CONF_OPTS += --with-minimum
 endif
 endif
 
-$(D)/libxml2: $(D)/bootstrap $(D)/zlib $(D)/python $(ARCHIVE)/$(LIBXML2_SOURCE)
+ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
+LIBXML2_CONF_OPTS  = --without-python
+ifeq ($(BOXARCH), sh4)
+LIBXML2_CONF_OPTS += --without-iconv
+LIBXML2_CONF_OPTS += --with-minimum
+endif
+endif
+
+$(D)/libxml2: $(D)/bootstrap $(D)/zlib $(LIBXML2_EXTERN) $(ARCHIVE)/$(LIBXML2_SOURCE)
 	$(START_BUILD)
 	$(REMOVE)/libxml2-$(LIBXML2_VER).tar.gz
 	$(UNTAR)/$(LIBXML2_SOURCE)
