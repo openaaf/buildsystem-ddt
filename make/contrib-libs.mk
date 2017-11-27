@@ -1447,6 +1447,8 @@ FFMPEG_PATCH += ffmpeg-hds-libroxml-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-aac-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-add-dash-demux-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-fix-mpegts-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-allow-to-choose-rtmp-impl-at-runtime-$(FFMPEG_VER).patch
 
 $(ARCHIVE)/$(FFMPEG_SOURCE):
 	$(WGET) http://www.ffmpeg.org/releases/$(FFMPEG_SOURCE)
@@ -1493,7 +1495,6 @@ ifeq ($(BOXARCH), sh4)
 FFMPEG_CONF_OPTS += --disable-armv5te --disable-armv6 --disable-armv6t2
 endif
 
-# $(D)/libroxml
 $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN) $(LIBRTMPDUMP) $(ARCHIVE)/$(FFMPEG_SOURCE)
 	$(START_BUILD)
 	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
