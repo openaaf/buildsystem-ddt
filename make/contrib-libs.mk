@@ -1457,38 +1457,21 @@ ifeq ($(IMAGE), enigma2)
 FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
 FFMPEG_EXTERN = $(D)/libroxml
-FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
-FFMPEG_CONF_OPTS  += --disable-filters --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto
-FFMPEG_CONF_OPTS  += --disable-protocol=data --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls
-FFMPEG_CONF_OPTS  += --disable-protocol=httpproxy --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp 
-FFMPEG_CONF_OPTS  += --disable-protocol=srtp --disable-protocol=subfile --disable-protocol=unix
-endif
-
-ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
-FFMPEG_CONF_OPTS  = --enable-librtmp
-LIBRTMPDUMP = $(D)/librtmpdump
-
-ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN += $(D)/libroxml $(D)/libxml2
-else
-FFMPEG_EXTERN = $(D)/libroxml
-FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
-FFMPEG_CONF_OPTS  += --disable-filters --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto
-FFMPEG_CONF_OPTS  += --disable-protocol=data --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls
-FFMPEG_CONF_OPTS  += --disable-protocol=httpproxy --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp 
-FFMPEG_CONF_OPTS  += --disable-protocol=srtp --disable-protocol=subfile --disable-protocol=unix
-endif
-
 endif
 
 ifeq ($(IMAGE), neutrino)
 FFMPEG_CONF_OPTS = --disable-iconv
 FFMPEG_EXTERN = $(D)/libroxml
-FFMPEG_CONF_OPTS  += --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers
-FFMPEG_CONF_OPTS  += --disable-filters --disable-protocol=cache --disable-protocol=concat --disable-protocol=crypto
-FFMPEG_CONF_OPTS  += --disable-protocol=data --disable-protocol=ftp --disable-protocol=gopher --disable-protocol=hls
-FFMPEG_CONF_OPTS  += --disable-protocol=httpproxy --disable-protocol=md5 --disable-protocol=pipe --disable-protocol=sctp 
-FFMPEG_CONF_OPTS  += --disable-protocol=srtp --disable-protocol=subfile --disable-protocol=unix
+endif
+
+ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
+FFMPEG_CONF_OPTS  = --enable-librtmp
+LIBRTMPDUMP = $(D)/librtmpdump
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
+else
+FFMPEG_EXTERN = $(D)/libroxml
+endif
 endif
 
 ifeq ($(BOXARCH), sh4)
@@ -1538,6 +1521,7 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--disable-vaapi \
 			--disable-vdpau \
 			\
+			--disable-muxers \
 			--enable-muxer=flac \
 			--enable-muxer=mp3 \
 			--enable-muxer=h261 \
@@ -1549,6 +1533,7 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-muxer=mpegts \
 			--enable-muxer=ogg \
 			\
+			--disable-parsers \
 			--enable-parser=aac \
 			--enable-parser=aac_latm \
 			--enable-parser=ac3 \
@@ -1564,6 +1549,7 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-parser=vc1 \
 			--enable-parser=vorbis \
 			\
+			--disable-encoders \
 			--enable-encoder=aac \
 			--enable-encoder=h261 \
 			--enable-encoder=h263 \
@@ -1574,6 +1560,7 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-encoder=mpeg2video \
 			--enable-encoder=png \
 			\
+			--disable-decoders \
 			--enable-decoder=aac \
 			--enable-decoder=aac_latm \
 			--enable-decoder=dca \
@@ -1615,6 +1602,7 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-decoder=wmav2 \
 			--enable-decoder=wmavoice \
 			\
+			--disable-demuxers \
 			--enable-demuxer=aac \
 			--enable-demuxer=ac3 \
 			--enable-demuxer=avi \
@@ -1646,6 +1634,22 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-demuxer=vc1 \
 			--enable-demuxer=wav \
 			\
+			--disable-protocol=cache \
+			--disable-protocol=concat \
+			--disable-protocol=crypto \
+			--disable-protocol=data \
+			--disable-protocol=ftp \
+			--disable-protocol=gopher \
+			--disable-protocol=hls \
+			--disable-protocol=httpproxy \
+			--disable-protocol=md5 \
+			--disable-protocol=pipe \
+			--disable-protocol=sctp \
+			--disable-protocol=srtp \
+			--disable-protocol=subfile \
+			--disable-protocol=unix \
+			\
+			--disable-filters \
 			--enable-filter=scale \
 			\
 			--disable-xlib \
