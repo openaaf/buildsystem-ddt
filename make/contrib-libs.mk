@@ -1465,12 +1465,13 @@ FFMPEG_EXTERN = $(D)/libroxml
 endif
 
 ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
-FFMPEG_CONF_OPTS  = --enable-librtmp
+FFMPEG_CONF_OPTS  = --enable-librtmp --enable-libass
 LIBRTMPDUMP = $(D)/librtmpdump
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2
+FFMPEG_EXTERN = $(D)/libroxml $(D)/libxml2  $(D)/libbluray
 else
 FFMPEG_EXTERN = $(D)/libroxml
+FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
 endif
 endif
 
@@ -1521,7 +1522,8 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--disable-vaapi \
 			--disable-vdpau \
 			\
-			--disable-muxers \
+			$(FFMPEG_DISABLE) \
+			\
 			--enable-muxer=flac \
 			--enable-muxer=mp3 \
 			--enable-muxer=h261 \
@@ -1533,7 +1535,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-muxer=mpegts \
 			--enable-muxer=ogg \
 			\
-			--disable-parsers \
 			--enable-parser=aac \
 			--enable-parser=aac_latm \
 			--enable-parser=ac3 \
@@ -1549,7 +1550,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-parser=vc1 \
 			--enable-parser=vorbis \
 			\
-			--disable-encoders \
 			--enable-encoder=aac \
 			--enable-encoder=h261 \
 			--enable-encoder=h263 \
@@ -1560,7 +1560,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-encoder=mpeg2video \
 			--enable-encoder=png \
 			\
-			--disable-decoders \
 			--enable-decoder=aac \
 			--enable-decoder=aac_latm \
 			--enable-decoder=dca \
@@ -1602,7 +1601,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-decoder=wmav2 \
 			--enable-decoder=wmavoice \
 			\
-			--disable-demuxers \
 			--enable-demuxer=aac \
 			--enable-demuxer=ac3 \
 			--enable-demuxer=avi \
@@ -1649,7 +1647,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--disable-protocol=subfile \
 			--disable-protocol=unix \
 			\
-			--disable-filters \
 			--enable-filter=scale \
 			\
 			--disable-xlib \
@@ -1672,7 +1669,7 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(D)/libass $(FFMPEG_EXTERN)
 			--enable-cross-compile \
 			--cross-prefix=$(TARGET)- \
 			--extra-cflags="-I$(TARGET_DIR)/usr/include/libxml2 -I$(TARGET_DIR)/usr/include -ffunction-sections -fdata-sections" \
-			--extra-ldflags="-L$(TARGET_DIR)/usr/lib -Wl,--gc-sections,-lrt" \
+			--extra-ldflags="$(TARGET_LDFLAGS) -lrt" \
 			--target-os=linux \
 			--arch=$(BOXARCH) \
 			--prefix=/usr \
