@@ -1010,7 +1010,7 @@ $(D)/libcurl: $(D)/bootstrap $(D)/zlib $(D)/openssl $(D)/ca-bundle $(ARCHIVE)/$(
 		rm -f $(TARGET_DIR)/usr/bin/curl-config
 	$(REWRITE_LIBTOOL)/libcurl.la
 	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libcurl.pc
-	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,curl)
+#	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,curl)
 	$(REMOVE)/curl-$(LIBCURL_VER)
 	$(TOUCH)
 
