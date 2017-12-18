@@ -817,13 +817,13 @@ JPEG_TURBO_SOURCE = libjpeg-turbo-$(JPEG_TURBO_VER).tar.gz
 $(ARCHIVE)/$(JPEG_TURBO_SOURCE):
 	$(WGET) https://sourceforge.net/projects/libjpeg-turbo/files/$(JPEG_TURBO_VER)/$(JPEG_TURBO_SOURCE)
 
-ifeq ($(BOXTYPE), $(filter $(BOXTYPE), fortis_hdbox octagon1008 ufs910 ufs922 ipbox55 ipbox99 ipbox9900 cuberevo cuberevo_mini cuberevo_mini2 cuberevo_250hd cuberevo_2000hd cuberevo_3000hd))
-$(D)/libjpeg: $(D)/jpeg
-	@touch $@
-else
+#ifeq ($(BOXTYPE), $(filter $(BOXTYPE), fortis_hdbox octagon1008 ufs910 ufs922 ipbox55 ipbox99 ipbox9900 cuberevo cuberevo_mini cuberevo_mini2 cuberevo_250hd cuberevo_2000hd cuberevo_3000hd))
+#$(D)/libjpeg: $(D)/jpeg
+#	@touch $@
+#else
 $(D)/libjpeg: $(D)/jpeg_turbo
-	@touch $@
-endif
+#	@touch $@
+#endif
 
 $(D)/jpeg_turbo: $(D)/bootstrap $(ARCHIVE)/$(JPEG_TURBO_SOURCE)
 	$(START_BUILD)
