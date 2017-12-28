@@ -804,7 +804,8 @@ $(D)/jpeg: $(D)/bootstrap $(ARCHIVE)/$(JPEG_SOURCE)
 		$(MAKE); \
 		$(MAKE) install DESTDIR=$(TARGET_DIR)
 	$(REWRITE_LIBTOOL)/libjpeg.la
-	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,cjpeg djpeg jpegtran rdjpgcom wrjpgcom)
+#	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,cjpeg djpeg jpegtran rdjpgcom wrjpgcom)
+	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,cjpeg djpeg rdjpgcom wrjpgcom)
 	$(REMOVE)/jpeg-$(JPEG_VER)
 	$(TOUCH)
 
@@ -853,7 +854,8 @@ $(D)/jpeg_turbo: $(D)/bootstrap $(ARCHIVE)/$(JPEG_TURBO_SOURCE)
 		$(MAKE) install DESTDIR=$(TARGET_DIR)
 	$(REWRITE_LIBTOOL)/libjpeg.la
 	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libjpeg.pc
-	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,cjpeg djpeg jpegtran rdjpgcom wrjpgcom tjbench)
+#	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,cjpeg djpeg jpegtran rdjpgcom wrjpgcom tjbench)
+	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,cjpeg djpeg rdjpgcom wrjpgcom tjbench)
 	rm -f $(TARGET_DIR)/usr/lib/libturbojpeg* $(TARGET_DIR)/usr/include/turbojpeg.h $(PKG_CONFIG_PATH)/libturbojpeg.pc
 	$(REMOVE)/libjpeg-turbo-$(JPEG_TURBO_VER)
 	$(TOUCH)
