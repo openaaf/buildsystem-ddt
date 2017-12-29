@@ -1889,6 +1889,7 @@ $(D)/libxml2: $(D)/bootstrap $(D)/zlib $(LIBXML2_EXTERN) $(ARCHIVE)/$(LIBXML2_SO
 	$(UNTAR)/$(LIBXML2_SOURCE)
 	set -e; cd $(BUILD_TMP)/libxml2-$(LIBXML2_VER); \
 		$(call post_patch,$(LIBXML2_PATCH)); \
+		autoreconf -fi; \
 		$(CONFIGURE) \
 			--target=$(TARGET) \
 			--prefix=/usr \
