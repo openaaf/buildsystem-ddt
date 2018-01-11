@@ -138,13 +138,15 @@ titan-libdreamdvd-distclean:
 # titan-plugins
 #
 
-$(D)/titan-plugins.do_prepare: | libpng libjpeg libfreetype libcurl
+#$(D)/titan-plugins.do_prepare: | libpng libjpeg libfreetype libcurl
+$(D)/titan-plugins.do_prepare: | libpng libjpeg freetype libcurl
 	[ -d "$(SOURCE_DIR)/titan" ] && \
 	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
 	svn checkout --username public --password public http://sbnc.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
 	ln -s $(SOURCE_DIR)/titan/libdreamdvd $(SOURCE_DIR)/titan/titan;
+	ln -s $(SOURCE_DIR)/titan/titan $(SOURCE_DIR)/titan/plugins;
 	touch $@
 
 $(SOURCE_DIR)/titan/plugins/config.status: titan-libdreamdvd
@@ -161,7 +163,8 @@ $(SOURCE_DIR)/titan/plugins/config.status: titan-libdreamdvd
 
 $(D)/titan-plugins.do_compile: $(SOURCE_DIR)/titan/plugins/config.status
 	cd $(SOURCE_DIR)/titan/plugins && \
-			$(MAKE) -C $(SOURCE_DIR)/titan/plugins all install DESTDIR=$(prefix)/$*cdkroot
+			$(MAKE) -C $(SOURCE_DIR)/titan/plugins all install DESTDIR=$(TARGET_DIR)
+#			$(MAKE) -C $(SOURCE_DIR)/titan/plugins all install DESTDIR=$(prefix)/$*cdkroot
 	touch $@
 
 $(D)/titan-plugins: titan-plugins.do_prepare titan-plugins.do_compile
