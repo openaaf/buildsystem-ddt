@@ -1501,6 +1501,7 @@ FFMPEG_PATCH += ffmpeg-08_recheck_discard_flags-$(FFMPEG_VER).patch
 #FFMPEG_PATCH += ffmpeg-09_ffmpeg_fix_edit_list_parsing-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-mips64_cpu_detection-$(FFMPEG_VER).patch
 #FFMPEG_PATCH += ffmpeg-hds-libroxml-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
 
 #			--extra-ldflags="$(TARGET_LDFLAGS) -lrt -lroxml"
 #WARNING: The --disable-yasm option is only provided for compatibility and will be
