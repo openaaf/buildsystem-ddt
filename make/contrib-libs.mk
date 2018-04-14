@@ -1488,7 +1488,7 @@ FFMPEG_PATCH += ffmpeg-add-dash-demux-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-fix-mpegts-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-allow-to-choose-rtmp-impl-at-runtime-$(FFMPEG_VER).patch
 
-ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912_aus))
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
 FFMPEG_VER = 3.4.2
 FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VER).tar.xz
 #FFMPEG_PATCH  = ffmpeg-01_dashdec_improvements-$(FFMPEG_VER).patch
@@ -1527,8 +1527,8 @@ FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray
 FFMPEG_CONF_OPTS  += --enable-libass
 
 FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
-#FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
-FFMPEG_CONF_OPTS  += --enable-xml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
+FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
+#FFMPEG_CONF_OPTS  += --enable-xml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
 
 FFMPEG_DISABLE = 			--enable-muxer=mpeg1video \
 			--enable-muxer=dash \
