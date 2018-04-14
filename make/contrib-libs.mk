@@ -1478,16 +1478,17 @@ $(D)/libx264: $(D)/bootstrap $(D)/libx264
 # ffmpeg
 #
 #FFMPEG_VER = 2.8.10
-#FFMPEG_VER = 3.2.2
-#FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VER).tar.xz
-#FFMPEG_PATCH  = ffmpeg-buffer-size-$(FFMPEG_VER).patch
-#FFMPEG_PATCH += ffmpeg-hds-libroxml-$(FFMPEG_VER).patch
-#FFMPEG_PATCH += ffmpeg-aac-$(FFMPEG_VER).patch
-#FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
-#FFMPEG_PATCH += ffmpeg-add-dash-demux-$(FFMPEG_VER).patch
-#FFMPEG_PATCH += ffmpeg-fix-mpegts-$(FFMPEG_VER).patch
-#FFMPEG_PATCH += ffmpeg-allow-to-choose-rtmp-impl-at-runtime-$(FFMPEG_VER).patch
+FFMPEG_VER = 3.2.2
+FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VER).tar.xz
+FFMPEG_PATCH  = ffmpeg-buffer-size-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-hds-libroxml-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-aac-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-add-dash-demux-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-fix-mpegts-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-allow-to-choose-rtmp-impl-at-runtime-$(FFMPEG_VER).patch
 
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs9121))
 FFMPEG_VER = 3.4.2
 FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VER).tar.xz
 #FFMPEG_PATCH  = ffmpeg-01_dashdec_improvements-$(FFMPEG_VER).patch
@@ -1502,12 +1503,7 @@ FFMPEG_PATCH += ffmpeg-08_recheck_discard_flags-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-mips64_cpu_detection-$(FFMPEG_VER).patch
 #FFMPEG_PATCH += ffmpeg-hds-libroxml-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
-
-#			--extra-ldflags="$(TARGET_LDFLAGS) -lrt -lroxml"
-#WARNING: The --disable-yasm option is only provided for compatibility and will be
-# removed in the future. Use --enable-x86asm / --disable-x86asm instead.
-#WARNING: Option --enable-demuxer=hds did not match anything
-#WARNING: Option --enable-demuxer=mp4 did not match anything
+endif
 
 $(ARCHIVE)/$(FFMPEG_SOURCE):
 	$(WGET) http://www.ffmpeg.org/releases/$(FFMPEG_SOURCE)
@@ -1523,71 +1519,21 @@ FFMPEG_CONF_OPTS = --disable-iconv
 FFMPEG_EXTERN = $(D)/libroxml
 endif
 
+https://dplaynordics-vod-46.akamaized.net/dplaydni/17864/1/dash/301645001/manifest.mpd?hdnts=st=1523737192~exp=1523823592~acl=/*~hmac=1d5302bea1c3d290f454aa34ff6e516a608ee62fbb11a37984c0a91d587175a7&bw_start=800
+/var/usr/lib/eplayer3 "https://dplaynordics-vod-46.akamaized.net/dplaydni/17864/0/hls/301645001/playlist.m3u8?hdnts=st=1523737192~exp=1523823592~acl=/*~hmac=1d5302bea1c3d290f454aa34ff6e516a608ee62fbb11a37984c0a91d587175a7&"
+
 ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
 FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray
+FFMPEG_CONF_OPTS  += --enable-libass
+
 FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
-FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264
-else
-FFMPEG_EXTERN = $(D)/libx264
-FFMPEG_CONF_OPTS  += --enable-libx264
-#FFMPEG_EXTERN = $(D)/libroxml
-FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
-endif
-endif
+#FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
+FFMPEG_CONF_OPTS  += --enable-xml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
 
-ifeq ($(BOXARCH), sh4)
-FFMPEG_CONF_OPTS += --disable-armv5te --disable-armv6 --disable-armv6t2
-endif
-
-$(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDUMP) $(ARCHIVE)/$(FFMPEG_SOURCE)
-	$(START_BUILD)
-	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
-	$(UNTAR)/$(FFMPEG_SOURCE)
-	set -e; cd $(BUILD_TMP)/ffmpeg-$(FFMPEG_VER); \
-		$(call post_patch,$(FFMPEG_PATCH)); \
-		./configure \
-			--disable-ffserver \
-			--disable-ffplay \
-			--disable-ffprobe \
-			\
-			--disable-doc \
-			--disable-htmlpages \
-			--disable-manpages \
-			--disable-podpages \
-			--disable-txtpages \
-			\
-			--disable-static \
-			--disable-runtime-cpudetect \
-			--disable-altivec \
-			--disable-amd3dnow \
-			--disable-amd3dnowext \
-			--disable-mmx \
-			--disable-mmxext \
-			--disable-sse \
-			--disable-sse2 \
-			--disable-sse3 \
-			--disable-ssse3 \
-			--disable-sse4 \
-			--disable-sse42 \
-			--disable-avx \
-			--disable-xop \
-			--disable-fma3 \
-			--disable-fma4 \
-			--disable-avx2 \
-			--disable-armv5te \
-			--disable-armv6 \
-			--disable-armv6t2 \
-			--disable-vfp \
-			--disable-neon \
-			--disable-inline-asm \
-			--disable-yasm \
-			--disable-fast-unaligned \
-			\
-			$(FFMPEG_DISABLE) \
-			\
-			--enable-muxer=mpeg1video \
+FFMPEG_DISABLE = 			--enable-muxer=mpeg1video \
 			--enable-muxer=dash \
 			--enable-muxer=h264 \
 			--enable-muxer=mp4 \
@@ -1671,10 +1617,196 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDU
 			--enable-filter=scale \
 			--enable-filter=drawtext \
 			--disable-debug \
+			--enable-zlib
+
+else
+FFMPEG_EXTERN = $(D)/libroxml
+FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
+endif
+endif
+
+ifeq ($(BOXARCH), sh4)
+FFMPEG_CONF_OPTS += --disable-armv5te --disable-armv6 --disable-armv6t2
+endif
+
+$(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDUMP) $(ARCHIVE)/$(FFMPEG_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
+	$(UNTAR)/$(FFMPEG_SOURCE)
+	set -e; cd $(BUILD_TMP)/ffmpeg-$(FFMPEG_VER); \
+		$(call post_patch,$(FFMPEG_PATCH)); \
+		./configure \
+			--disable-ffserver \
+			--disable-ffplay \
+			--disable-ffprobe \
+			\
+			--disable-doc \
+			--disable-htmlpages \
+			--disable-manpages \
+			--disable-podpages \
+			--disable-txtpages \
+			\
+			--disable-altivec \
+			--disable-amd3dnow \
+			--disable-amd3dnowext \
+			--disable-mmx \
+			--disable-mmxext \
+			--disable-sse \
+			--disable-sse2 \
+			--disable-sse3 \
+			--disable-ssse3 \
+			--disable-sse4 \
+			--disable-sse42 \
+			--disable-avx \
+			--disable-fma4 \
+			--disable-vfp \
+			--disable-neon \
+			--disable-inline-asm \
+			--disable-yasm \
+			--disable-mips32r2 \
+			--disable-mipsdspr2 \
+			--disable-mipsfpu \
+			--disable-fast-unaligned \
+			\
+			--disable-dxva2 \
+			--disable-vaapi \
+			--disable-vdpau \
+			\
+			$(FFMPEG_DISABLE) \
+			\
+			--enable-muxer=flac \
+			--enable-muxer=mp3 \
+			--enable-muxer=h261 \
+			--enable-muxer=h263 \
+			--enable-muxer=h264 \
+			--enable-muxer=image2 \
+			--enable-muxer=mpeg1video \
+			--enable-muxer=mpeg2video \
+			--enable-muxer=mpegts \
+			--enable-muxer=ogg \
+			\
+			--enable-parser=aac \
+			--enable-parser=aac_latm \
+			--enable-parser=ac3 \
+			--enable-parser=dca \
+			--enable-parser=dvbsub \
+			--enable-parser=dvdsub \
+			--enable-parser=flac \
+			--enable-parser=h264 \
+			--enable-parser=mjpeg \
+			--enable-parser=mpeg4video \
+			--enable-parser=mpegvideo \
+			--enable-parser=mpegaudio \
+			--enable-parser=vc1 \
+			--enable-parser=vorbis \
+			\
+			--enable-encoder=aac \
+			--enable-encoder=h261 \
+			--enable-encoder=h263 \
+			--enable-encoder=h263p \
+			--enable-encoder=ljpeg \
+			--enable-encoder=mjpeg \
+			--enable-encoder=mpeg1video \
+			--enable-encoder=mpeg2video \
+			--enable-encoder=png \
+			\
+			--enable-decoder=aac \
+			--enable-decoder=aac_latm \
+			--enable-decoder=dca \
+			--enable-decoder=dvbsub \
+			--enable-decoder=dvdsub \
+			--enable-decoder=flac \
+			--enable-decoder=h261 \
+			--enable-decoder=h263 \
+			--enable-decoder=h263i \
+			--enable-decoder=h264 \
+			--enable-decoder=mjpeg \
+			--enable-decoder=mp3 \
+			--enable-decoder=movtext \
+			--enable-decoder=mpeg1video \
+			--enable-decoder=mpeg2video \
+			--enable-decoder=msmpeg4v1 \
+			--enable-decoder=msmpeg4v2 \
+			--enable-decoder=msmpeg4v3 \
+			--enable-decoder=pcm_s16le \
+			--enable-decoder=pcm_s16be \
+			--enable-decoder=pcm_s16le_planar \
+			--enable-decoder=pcm_s16be_planar \
+			--enable-decoder=pgssub \
+			--enable-decoder=png \
+			--enable-decoder=ra_144 \
+			--enable-decoder=ra_288 \
+			--enable-decoder=rawvideo \
+			--enable-decoder=srt \
+			--enable-decoder=subrip \
+			--enable-decoder=subviewer \
+			--enable-decoder=subviewer1 \
+			--enable-decoder=text \
+			--enable-decoder=theora \
+			--enable-decoder=vorbis \
+			--enable-decoder=wmv3 \
+			--enable-decoder=xsub \
+			--enable-decoder=wmapro \
+			--enable-decoder=wmav1 \
+			--enable-decoder=wmav2 \
+			--enable-decoder=wmavoice \
+			\
+			--enable-demuxer=aac \
+			--enable-demuxer=ac3 \
+			--enable-demuxer=avi \
+			--enable-demuxer=dts \
+			--enable-demuxer=dash \
+			--enable-demuxer=flac \
+			--enable-demuxer=flv \
+			--enable-demuxer=hds \
+			--enable-demuxer=hls \
+			--enable-demuxer=image2 \
+			--enable-demuxer=image2pipe \
+			--enable-demuxer=image_jpeg_pipe \
+			--enable-demuxer=image_png_pipe \
+			--enable-demuxer=matroska \
+			--enable-demuxer=mjpeg \
+			--enable-demuxer=mov \
+			--enable-demuxer=mp3 \
+			--enable-demuxer=mpegts \
+			--enable-demuxer=mpegtsraw \
+			--enable-demuxer=mpegps \
+			--enable-demuxer=mpegvideo \
+			--enable-demuxer=ogg \
+			--enable-demuxer=pcm_s16be \
+			--enable-demuxer=pcm_s16le \
+			--enable-demuxer=rm \
+			--enable-demuxer=rtp \
+			--enable-demuxer=rtsp \
+			--enable-demuxer=srt \
+			--enable-demuxer=vc1 \
+			--enable-demuxer=wav \
+			\
+			--disable-protocol=cache \
+			--disable-protocol=concat \
+			--disable-protocol=data \
+			--disable-protocol=ftp \
+			--disable-protocol=gopher \
+			--disable-protocol=hls \
+			--disable-protocol=httpproxy \
+			--disable-protocol=md5 \
+			--disable-protocol=pipe \
+			--disable-protocol=sctp \
+			--disable-protocol=srtp \
+			--disable-protocol=subfile \
+			--disable-protocol=unix \
+			\
+			--enable-filter=scale \
+			\
+			--disable-xlib \
+			--disable-libxcb \
+			--disable-postproc \
+			--enable-bsfs \
+			--disable-indevs \
+			--disable-outdevs \
+			--enable-bzlib \
 			--enable-zlib \
 			$(FFMPEG_CONF_OPTS) \
-			--enable-gpl \
-			--enable-nonfree \
 			--disable-static \
 			--enable-openssl \
 			--enable-network \
@@ -1704,38 +1836,7 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDU
 	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libavutil.pc
 	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libswresample.pc
 	test -e $(PKG_CONFIG_PATH)/libswscale.pc && $(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libswscale.pc || true
-#	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
-	$(TOUCH)
-
-#
-# libass
-#
-LIBASS_VER = 0.12.3
-LIBASS_SOURCE = libass-$(LIBASS_VER).tar.xz
-LIBASS_PATCH = libass-$(LIBASS_VER).patch
-
-$(ARCHIVE)/$(LIBASS_SOURCE):
-	$(WGET) https://github.com/libass/libass/releases/download/$(LIBASS_VER)/$(LIBASS_SOURCE)
-
-$(D)/libass: $(D)/bootstrap $(D)/freetype $(D)/libfribidi $(ARCHIVE)/$(LIBASS_SOURCE)
-	$(START_BUILD)
-	$(REMOVE)/libass-$(LIBASS_VER)
-	$(UNTAR)/$(LIBASS_SOURCE)
-	set -e; cd $(BUILD_TMP)/libass-$(LIBASS_VER); \
-		$(call post_patch,$(LIBASS_PATCH)); \
-		$(CONFIGURE) \
-			--prefix=/usr \
-			--disable-static \
-			--disable-test \
-			--disable-fontconfig \
-			--disable-harfbuzz \
-			--disable-enca \
-		; \
-		$(MAKE); \
-		$(MAKE) install DESTDIR=$(TARGET_DIR)
-	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libass.pc
-	$(REWRITE_LIBTOOL)/libass.la
-	$(REMOVE)/libass-$(LIBASS_VER)
+	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
 	$(TOUCH)
 
 #
