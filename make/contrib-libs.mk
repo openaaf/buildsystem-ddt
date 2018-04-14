@@ -1488,7 +1488,7 @@ FFMPEG_PATCH += ffmpeg-add-dash-demux-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-fix-mpegts-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-allow-to-choose-rtmp-impl-at-runtime-$(FFMPEG_VER).patch
 
-ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs9121))
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912_aus))
 FFMPEG_VER = 3.4.2
 FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VER).tar.xz
 #FFMPEG_PATCH  = ffmpeg-01_dashdec_improvements-$(FFMPEG_VER).patch
@@ -1518,9 +1518,6 @@ ifeq ($(IMAGE), neutrino)
 FFMPEG_CONF_OPTS = --disable-iconv
 FFMPEG_EXTERN = $(D)/libroxml
 endif
-
-https://dplaynordics-vod-46.akamaized.net/dplaydni/17864/1/dash/301645001/manifest.mpd?hdnts=st=1523737192~exp=1523823592~acl=/*~hmac=1d5302bea1c3d290f454aa34ff6e516a608ee62fbb11a37984c0a91d587175a7&bw_start=800
-/var/usr/lib/eplayer3 "https://dplaynordics-vod-46.akamaized.net/dplaydni/17864/0/hls/301645001/playlist.m3u8?hdnts=st=1523737192~exp=1523823592~acl=/*~hmac=1d5302bea1c3d290f454aa34ff6e516a608ee62fbb11a37984c0a91d587175a7&"
 
 ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
 FFMPEG_CONF_OPTS  = --enable-librtmp
