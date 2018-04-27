@@ -1488,7 +1488,7 @@ FFMPEG_PATCH += ffmpeg-add-dash-demux-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-fix-mpegts-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-allow-to-choose-rtmp-impl-at-runtime-$(FFMPEG_VER).patch
 
-ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912aus))
 FFMPEG_VER = 3.4.2
 FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VER).tar.xz
 #FFMPEG_PATCH  = ffmpeg-01_dashdec_improvements-$(FFMPEG_VER).patch
@@ -1523,9 +1523,10 @@ ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
 FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray
-FFMPEG_CONF_OPTS  += --enable-libass
-
+FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2 $(D)/libbluray
+FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
+endif
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912aus))
 FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
 FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
 #FFMPEG_CONF_OPTS  += --enable-xml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
