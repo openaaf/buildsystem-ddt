@@ -1522,10 +1522,6 @@ endif
 ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
 FFMPEG_CONF_OPTS  = --enable-librtmp
 LIBRTMPDUMP = $(D)/librtmpdump
-ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2 $(D)/libbluray
-FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
-endif
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912aus))
 FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
 FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
@@ -1620,6 +1616,10 @@ FFMPEG_DISABLE = 			--enable-muxer=mpeg1video \
 else
 FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
+endif
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2 $(D)/libbluray
+FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
 endif
 endif
 
