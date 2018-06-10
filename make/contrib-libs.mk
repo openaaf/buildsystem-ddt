@@ -1617,6 +1617,9 @@ else
 FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
 endif
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), spark7162))
+FFMPEG_EXTERN = $(D)/libass
+endif
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
 FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2 $(D)/libbluray
 FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
