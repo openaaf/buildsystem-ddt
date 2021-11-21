@@ -143,6 +143,7 @@ $(D)/host_mksquashfs3: directories $(ARCHIVE)/$(HOST_MKSQUASHFS3_SOURCE)
 #
 HOST_MKSQUASHFS_VER = 4.2
 HOST_MKSQUASHFS_SOURCE = squashfs$(HOST_MKSQUASHFS_VER).tar.gz
+HOST_MKSQUASHFS_PATCH = squashfs-$(HOST_MKSQUASHFS_VER)-sysmacros.patch
 
 LZMA_VER = 4.65
 LZMA_SOURCE = lzma-$(LZMA_VER).tar.bz2
@@ -160,6 +161,7 @@ $(D)/host_mksquashfs: directories $(ARCHIVE)/$(LZMA_SOURCE) $(ARCHIVE)/$(HOST_MK
 	$(REMOVE)/squashfs$(HOST_MKSQUASHFS_VER)
 	$(UNTAR)/$(HOST_MKSQUASHFS_SOURCE)
 	set -e; cd $(BUILD_TMP)/squashfs$(HOST_MKSQUASHFS_VER); \
+        $(call post_patch,$(HOST_MKSQUASHFS_PATCH)); \
 		$(MAKE) -C squashfs-tools \
 			LZMA_SUPPORT=1 \
 			LZMA_DIR=$(BUILD_TMP)/lzma-$(LZMA_VER) \
