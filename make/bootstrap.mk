@@ -111,6 +111,7 @@ $(D)/host_mkcramfs: directories $(ARCHIVE)/$(HOST_MKCRAMFS_SOURCE)
 	$(REMOVE)/cramfs-$(HOST_MKCRAMFS_VER)
 	$(UNTAR)/$(HOST_MKCRAMFS_SOURCE)
 	set -e; cd $(BUILD_TMP)/cramfs-$(HOST_MKCRAMFS_VER); \
+		$(call post_patch,$(HOST_MKCRAMFS_PATCH)); \
 		$(MAKE) all
 		cp $(BUILD_TMP)/cramfs-$(HOST_MKCRAMFS_VER)/mkcramfs $(HOST_DIR)/bin
 		cp $(BUILD_TMP)/cramfs-$(HOST_MKCRAMFS_VER)/cramfsck $(HOST_DIR)/bin
