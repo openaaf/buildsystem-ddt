@@ -101,6 +101,7 @@ $(D)/host_mtd_utils: directories $(ARCHIVE)/$(HOST_MTD_UTILS_SOURCE)
 #
 HOST_MKCRAMFS_VER = 1.1
 HOST_MKCRAMFS_SOURCE = cramfs-$(HOST_MKCRAMFS_VER).tar.gz
+HOST_MKCRAMFS_PATCH = cramfs-$(HOST_MKCRAMFS_VER)-sysmacros.patch
 
 $(ARCHIVE)/$(HOST_MKCRAMFS_SOURCE):
 	$(WGET) https://sourceforge.net/projects/cramfs/files/cramfs/$(HOST_MKCRAMFS_VER)/$(HOST_MKCRAMFS_SOURCE)
