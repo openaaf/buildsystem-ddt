@@ -128,9 +128,12 @@ $(D)/libffi: $(D)/bootstrap $(ARCHIVE)/$(LIBFFI_SOURCE)
 #
 # host_libglib2_genmarshal
 #
+#LIBGLIB2_VER_MAJOR = 2
+#LIBGLIB2_VER_MINOR = 54
+#LIBGLIB2_VER_MICRO = 0
 LIBGLIB2_VER_MAJOR = 2
-LIBGLIB2_VER_MINOR = 54
-LIBGLIB2_VER_MICRO = 0
+LIBGLIB2_VER_MINOR = 57
+LIBGLIB2_VER_MICRO = 1
 LIBGLIB2_VER = $(LIBGLIB2_VER_MAJOR).$(LIBGLIB2_VER_MINOR).$(LIBGLIB2_VER_MICRO)
 LIBGLIB2_SOURCE = glib-$(LIBGLIB2_VER).tar.xz
 LIBGLIB2_HOST_PATCH =
@@ -146,7 +149,7 @@ $(D)/host_libglib2_genmarshal: $(D)/bootstrap $(D)/host_libffi $(ARCHIVE)/$(LIBG
 	set -e; cd $(BUILD_TMP)/glib-$(LIBGLIB2_VER); \
 		export PKG_CONFIG=/usr/bin/pkg-config; \
 		export PKG_CONFIG_PATH=$(HOST_DIR)/lib/pkgconfig; \
-		$(call post_patch,$(LIBGLIB2_HOST_PATCH)); \
+#		$(call post_patch,$(LIBGLIB2_HOST_PATCH)); \
 		./configure \
 			--prefix=`pwd`/out \
 			--enable-static=yes \
@@ -154,6 +157,7 @@ $(D)/host_libglib2_genmarshal: $(D)/bootstrap $(D)/host_libffi $(ARCHIVE)/$(LIBG
 			--disable-fam \
 			--disable-libmount \
 			--with-pcre=internal \
+			--disable-compile-warnings \
 		; \
 		$(MAKE) install; \
 		cp -a out/bin/glib-* $(HOST_DIR)/bin
