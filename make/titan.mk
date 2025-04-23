@@ -19,7 +19,7 @@ $(D)/titan.do_prepare: | $(TITAN_DEPS)
 	[ -d "$(SOURCE_DIR)/titan" ] && \
 	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
-	svn checkout --username public --password public http://sbnc.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
+	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	COMPRESSBIN=gzip; \
 	COMPRESSEXT=gz; \
 	$(if $(UFS910), COMPRESSBIN=lzma;) \
@@ -95,7 +95,7 @@ $(D)/titan-libdreamdvd.do_prepare: | bootstrap libdvdnav
 	[ -d "$(SOURCE_DIR)/titan" ] && \
 	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
-	svn checkout --username public --password public http://sbnc.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
+	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
 	ln -s $(SOURCE_DIR)/titan/libdreamdvd $(SOURCE_DIR)/titan/titan; \
 	touch $@
@@ -143,7 +143,7 @@ $(D)/titan-plugins.do_prepare: | libpng libjpeg freetype libcurl
 	[ -d "$(SOURCE_DIR)/titan" ] && \
 	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
-	svn checkout --username public --password public http://sbnc.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
+	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
 	ln -s $(SOURCE_DIR)/titan/libdreamdvd $(SOURCE_DIR)/titan/titan;
 	ln -s $(SOURCE_DIR)/titan/titan $(SOURCE_DIR)/titan/plugins;
