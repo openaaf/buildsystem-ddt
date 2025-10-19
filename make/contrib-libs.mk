@@ -1491,6 +1491,7 @@ FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-add-dash-demux-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-fix-mpegts-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-allow-to-choose-rtmp-impl-at-runtime-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-remove_diagnostics-color=auto.patch
 
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912aus))
 FFMPEG_VER = 3.4.2
@@ -1507,6 +1508,7 @@ FFMPEG_PATCH += ffmpeg-08_recheck_discard_flags-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-mips64_cpu_detection-$(FFMPEG_VER).patch
 #FFMPEG_PATCH += ffmpeg-hds-libroxml-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-remove_diagnostics-color=auto.patch
 endif
 
 $(ARCHIVE)/$(FFMPEG_SOURCE):

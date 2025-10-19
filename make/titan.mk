@@ -9,6 +9,8 @@ yaud-titan: yaud-none \
 	$(TUXBOX_YAUD_CUSTOMIZE)
 
 #TITAN_DEPS  = bootstrap libcurl curlftpfs rarfs djmount libfreetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
+# djmount not building on linux mint 22.04
+#TITAN_DEPS  = bootstrap libcurl curlftpfs rarfs freetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
 TITAN_DEPS  = bootstrap libcurl curlftpfs rarfs djmount freetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
 
 #TITAN_DEPS  = bootstrap libcurl curlftpfs rarfs djmount freetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tools-libmme_host tools-libmme_image
