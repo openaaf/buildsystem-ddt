@@ -335,15 +335,35 @@ $(D)/readline: $(D)/bootstrap $(ARCHIVE)/$(READLINE_SOURCE)
 #
 # openssl
 #
+#OPENSSL_MAJOR = 1.0.2
+#OPENSSL_MINOR = k
+#OPENSSL_VER = $(OPENSSL_MAJOR)$(OPENSSL_MINOR)
+#OPENSSL_SOURCE = openssl-$(OPENSSL_VER).tar.gz
+#OPENSSL_PATCH  = openssl-$(OPENSSL_VER)-optimize-for-size.patch
+#OPENSSL_PATCH += openssl-$(OPENSSL_VER)-makefile-dirs.patch
+#OPENSSL_PATCH += openssl-$(OPENSSL_VER)-disable_doc_tests.patch
+#OPENSSL_PATCH += openssl-$(OPENSSL_VER)-fix-parallel-building.patch
+#OPENSSL_PATCH += openssl-$(OPENSSL_VER)-compat_versioned_symbols-1.patch
+
+ifeq ($(FFMPEG_VER), 2.8.18)
 OPENSSL_MAJOR = 1.0.2
-OPENSSL_MINOR = k
+OPENSSL_MINOR = u
 OPENSSL_VER = $(OPENSSL_MAJOR)$(OPENSSL_MINOR)
-OPENSSL_SOURCE = openssl-$(OPENSSL_VER).tar.gz
 OPENSSL_PATCH  = openssl-$(OPENSSL_VER)-optimize-for-size.patch
 OPENSSL_PATCH += openssl-$(OPENSSL_VER)-makefile-dirs.patch
 OPENSSL_PATCH += openssl-$(OPENSSL_VER)-disable_doc_tests.patch
 OPENSSL_PATCH += openssl-$(OPENSSL_VER)-fix-parallel-building.patch
 OPENSSL_PATCH += openssl-$(OPENSSL_VER)-compat_versioned_symbols-1.patch
+OPENSSL_PATCH += openssl-$(OPENSSL_VER)-remove_timestamp_check.patch
+OPENSSL_TARGETDIR =
+else
+OPENSSL_MAJOR = 1.1.1
+OPENSSL_MINOR = j
+OPENSSL_VER = $(OPENSSL_MAJOR)$(OPENSSL_MINOR)
+OPENSSL_PATCH += openssl-$(OPENSSL_VER)-compat_versioned_symbols-1.patch
+OPENSSL_TARGETDIR = $(TARGET_DIR)
+endif
+OPENSSL_SOURCE = openssl-$(OPENSSL_VER).tar.gz
 
 ifeq ($(BOXARCH), sh4)
 OPENSSL_SED_PATCH = sed -i 's|MAKEDEPPROG=makedepend|MAKEDEPPROG=$(CROSS_DIR)/bin/$$(CC) -M|' Makefile
@@ -361,13 +381,13 @@ $(D)/openssl: $(D)/bootstrap $(ARCHIVE)/$(OPENSSL_SOURCE)
 	set -e; cd $(BUILD_TMP)/openssl-$(OPENSSL_VER); \
 		$(call post_patch,$(OPENSSL_PATCH)); \
 		$(BUILDENV) \
-		./Configure \
+		./Configure $(SILENT_OPT) \
 			-DL_ENDIAN \
 			shared \
 			no-hw \
 			linux-generic32 \
-			--prefix=/usr \
-			--openssldir=/etc/ssl \
+			--prefix=$(OPENSSL_TARGETDIR)/usr \
+			--openssldir=$(OPENSSL_TARGETDIR)/etc/ssl \
 		; \
 		$(OPENSSL_SED_PATCH); \
 		$(MAKE) depend; \
@@ -377,9 +397,14 @@ $(D)/openssl: $(D)/bootstrap $(ARCHIVE)/$(OPENSSL_SOURCE)
 	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/openssl.pc
 	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libcrypto.pc
 	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libssl.pc
-	cd $(TARGET_DIR) && rm -rf etc/ssl/man usr/bin/openssl usr/lib/engines
+	cd $(TARGET_DIR) && rm -rf etc/ssl/man usr/bin/openssl usr/lib/engines-1.1
+ifeq ($(OPENSSL_MAJOR), 1.0.2)
 	ln -sf libcrypto.so.1.0.0 $(TARGET_DIR)/usr/lib/libcrypto.so.0.9.8
 	ln -sf libssl.so.1.0.0 $(TARGET_DIR)/usr/lib/libssl.so.0.9.8
+else
+	ln -sf libcrypto.so.1.1 $(TARGET_DIR)/usr/lib/libcrypto.so.0.9.8
+	ln -sf libssl.so.1.1 $(TARGET_DIR)/usr/lib/libssl.so.0.9.8
+endif
 	$(REMOVE)/openssl-$(OPENSSL_VER)
 	$(TOUCH)
 
