@@ -279,7 +279,8 @@ $(D)/portmap: $(D)/bootstrap $(D)/lsb $(ARCHIVE)/$(PORTMAP_SOURCE) $(ARCHIVE)/po
 #
 # e2fsprogs
 #
-ifeq ($(whoami), $(filter $(whoami), obi))
+
+ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
 E2FSPROGS_VER = 1.46.5
 else
 E2FSPROGS_VER = 1.43.7

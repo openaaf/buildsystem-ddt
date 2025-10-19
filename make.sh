@@ -264,6 +264,8 @@ case "$REPLY" in
 esac
 echo "IMAGE=$IMAGE" >> config
 
+echo "BUILDUSER=$(whoami)" >> config
+
 ##############################################
 echo " "
 make printenv
