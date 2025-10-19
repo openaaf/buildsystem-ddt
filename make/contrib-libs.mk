@@ -60,7 +60,7 @@ GMP_VER = $(GMP_VER_MAJOR)$(GMP_VER_MINOR)
 GMP_SOURCE = gmp-$(GMP_VER).tar.xz
 
 $(ARCHIVE)/$(GMP_SOURCE):
-	$(WGET) ftp://ftp.gmplib.org/pub/gmp-$(GMP_VER_MAJOR)/$(GMP_SOURCE)
+	$(WGET) ftp://ftp.gnu.org/gnu/gmp/$(GMP_SOURCE)
 
 $(D)/gmp: $(D)/bootstrap $(ARCHIVE)/$(GMP_SOURCE)
 	$(START_BUILD)
@@ -2480,22 +2480,29 @@ $(D)/libopenthreads: $(D)/bootstrap $(ARCHIVE)/$(LIBOPENTHREADS_SOURCE)
 #
 # librtmpdump
 #
-LIBRTMPDUMP_VER = ad70c64
-LIBRTMPDUMP_SOURCE = librtmpdump-$(LIBRTMPDUMP_VER).tar.bz2
-LIBRTMPDUMP_URL = git://github.com/oe-alliance/rtmpdump.git
+ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi1))
+LIBRTMPDUMP_VER = 6f6bb1353fc84f4cc37138baa99f586750028a01
+LIBRTMPDUMP_URL = git://git.ffmpeg.org/rtmpdump
 LIBRTMPDUMP_PATCH = rtmpdump-2.4.patch
+#LIBRTMPDUMP_PATCH = rtmpdump-2.6.patch
+else
+LIBRTMPDUMP_VER = ad70c64
+LIBRTMPDUMP_URL = https://github.com/oe-alliance/rtmpdump.git
+LIBRTMPDUMP_PATCH = rtmpdump-2.4.patch
+endif
+LIBRTMPDUMP_SOURCE = librtmpdump-$(LIBRTMPDUMP_VER).tar.bz2
 
 $(ARCHIVE)/$(LIBRTMPDUMP_SOURCE):
 	$(SCRIPTS_DIR)/get-git-archive.sh $(LIBRTMPDUMP_URL) $(LIBRTMPDUMP_VER) $(notdir $@) $(ARCHIVE)
 
-$(D)/librtmpdump: $(D)/bootstrap $(D)/zlib $(D)/openssl $(ARCHIVE)/$(LIBRTMPDUMP_SOURCE)
+$(D)/librtmpdump: $(D)/bootstrap $(D)/gnutls $(D)/zlib $(D)/openssl $(ARCHIVE)/$(LIBRTMPDUMP_SOURCE)
 	$(START_BUILD)
 	$(REMOVE)/librtmpdump-$(LIBRTMPDUMP_VER)
 	$(UNTAR)/$(LIBRTMPDUMP_SOURCE)
 	set -e; cd $(BUILD_TMP)/librtmpdump-$(LIBRTMPDUMP_VER); \
 		$(call post_patch,$(LIBRTMPDUMP_PATCH)); \
 		$(BUILDENV) \
-		$(MAKE) CROSS_COMPILE=$(TARGET)- ; \
+		$(MAKE) CROSS_COMPILE=$(TARGET)- XCFLAGS="-I$(TARGET_INCLUDE_DIR) -L$(TARGET_LIB_DIR)" LDFLAGS="-L$(TARGET_LIB_DIR)"; \
 		$(MAKE) install prefix=/usr DESTDIR=$(TARGET_DIR) MANDIR=$(TARGET_DIR)/.remove
 	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/librtmp.pc
 	rm -f $(addprefix $(TARGET_DIR)/usr/sbin/,rtmpgw rtmpsrv rtmpsuck)
@@ -2883,7 +2890,7 @@ GNUTLS_VER = $(GNUTLS_VER_MAJOR).$(GNUTLS_VER_MINOR)
 GNUTLS_SOURCE = gnutls-$(GNUTLS_VER).tar.xz
 
 $(ARCHIVE)/$(GNUTLS_SOURCE):
-	$(WGET) ftp://ftp.gnutls.org/gcrypt/gnutls/v$(GNUTLS_VER_MAJOR)/$(GNUTLS_SOURCE)
+	$(WGET) https://gnupg.org/ftp/gcrypt/gnutls/v$(GNUTLS_VER_MAJOR)/$(GNUTLS_SOURCE)
 
 $(D)/gnutls: $(D)/bootstrap $(D)/nettle $(ARCHIVE)/$(GNUTLS_SOURCE)
 	$(START_BUILD)
