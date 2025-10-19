@@ -1518,22 +1518,44 @@ FFMPEG_PATCH += ffmpeg-fix-mpegts-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-allow-to-choose-rtmp-impl-at-runtime-$(FFMPEG_VER).patch
 FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-remove_diagnostics-color=auto.patch
 
-ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912aus))
-FFMPEG_VER = 3.4.2
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+#FFMPEG_VER = 3.4.2
+#FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VER).tar.xz
+##FFMPEG_PATCH  = ffmpeg-01_dashdec_improvements-$(FFMPEG_VER).patch
+#FFMPEG_PATCH = ffmpeg-02_fix_mpegts-$(FFMPEG_VER).patch
+#FFMPEG_PATCH += ffmpeg-03_allow_to_choose_rtmp_impl_at_runtime-$(FFMPEG_VER).patch
+#FFMPEG_PATCH += ffmpeg-04_hls_replace_key_uri-$(FFMPEG_VER).patch
+#FFMPEG_PATCH += ffmpeg-05_chunked_transfer_fix_eof-$(FFMPEG_VER).patch
+#FFMPEG_PATCH += ffmpeg-06_optimize_aac-$(FFMPEG_VER).patch
+#FFMPEG_PATCH += ffmpeg-07_increase_buffer_size-$(FFMPEG_VER).patch
+#FFMPEG_PATCH += ffmpeg-08_recheck_discard_flags-$(FFMPEG_VER).patch
+##FFMPEG_PATCH += ffmpeg-09_ffmpeg_fix_edit_list_parsing-$(FFMPEG_VER).patch
+#FFMPEG_PATCH += ffmpeg-mips64_cpu_detection-$(FFMPEG_VER).patch
+##FFMPEG_PATCH += ffmpeg-hds-libroxml-$(FFMPEG_VER).patch
+#FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
+#FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-remove_diagnostics-color=auto.patch
+
+FFMPEG_VER = 4.3.2
 FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VER).tar.xz
-#FFMPEG_PATCH  = ffmpeg-01_dashdec_improvements-$(FFMPEG_VER).patch
-FFMPEG_PATCH = ffmpeg-02_fix_mpegts-$(FFMPEG_VER).patch
-FFMPEG_PATCH += ffmpeg-03_allow_to_choose_rtmp_impl_at_runtime-$(FFMPEG_VER).patch
-FFMPEG_PATCH += ffmpeg-04_hls_replace_key_uri-$(FFMPEG_VER).patch
-FFMPEG_PATCH += ffmpeg-05_chunked_transfer_fix_eof-$(FFMPEG_VER).patch
-FFMPEG_PATCH += ffmpeg-06_optimize_aac-$(FFMPEG_VER).patch
-FFMPEG_PATCH += ffmpeg-07_increase_buffer_size-$(FFMPEG_VER).patch
-FFMPEG_PATCH += ffmpeg-08_recheck_discard_flags-$(FFMPEG_VER).patch
-#FFMPEG_PATCH += ffmpeg-09_ffmpeg_fix_edit_list_parsing-$(FFMPEG_VER).patch
-FFMPEG_PATCH += ffmpeg-mips64_cpu_detection-$(FFMPEG_VER).patch
-#FFMPEG_PATCH += ffmpeg-hds-libroxml-$(FFMPEG_VER).patch
-FFMPEG_PATCH += ffmpeg-kodi-$(FFMPEG_VER).patch
+FFMPEG_PATCH  = ffmpeg-$(FFMPEG_VER)-aac.patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-allow_to_choose_rtmp_impl_at_runtime.patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-buffer-size.patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-fix-edit-list-parsing.patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-fix-hls.patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-fix_mpegts.patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-hls_replace_key_uri.patch
+#FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-mips64_cpu_detection.patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-corrupt-h264-frames.patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-FFmpeg-devel-amfenc-Add-support-for-pict_type-field.patch
+FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-INT64-fix.patch
 FFMPEG_PATCH += ffmpeg-$(FFMPEG_VER)-remove_diagnostics-color=auto.patch
+FFMPEG_CONF_OPTS   = --disable-librtmp
+FFMPEG_CONF_OPTS  += --enable-libxml2
+FFMPEG_CONF_OPTS  += --enable-libfreetype
+FFMPEG_CONF_OPTS  += --disable-x86asm
+
+FFMPEG_EXTRA_CFLAGS  = -I$(TARGET_INCLUDE_DIR)/libxml2
+
 endif
 
 $(ARCHIVE)/$(FFMPEG_SOURCE):
@@ -1645,6 +1667,9 @@ FFMPEG_DISABLE = 			--enable-muxer=mpeg1video \
 			--enable-zlib
 
 else
+#FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
+#FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
+
 FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
 endif
@@ -1655,8 +1680,10 @@ ifeq ($(BOXTYPE), $(filter $(BOXTYPE), spark))
 FFMPEG_EXTERN = $(D)/libass
 endif
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2 $(D)/libbluray
-FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
+#FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2 $(D)/libbluray
+#FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
+FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
+FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
 endif
 endif
 
@@ -1671,7 +1698,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDU
 	set -e; cd $(BUILD_TMP)/ffmpeg-$(FFMPEG_VER); \
 		$(call post_patch,$(FFMPEG_PATCH)); \
 		./configure \
-			--disable-ffserver \
 			--disable-ffplay \
 			--disable-ffprobe \
 			\
@@ -2480,22 +2506,24 @@ $(D)/libopenthreads: $(D)/bootstrap $(ARCHIVE)/$(LIBOPENTHREADS_SOURCE)
 #
 # librtmpdump
 #
-ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi1))
+ifeq ($(BUILDUSER), $(filter $(BUILDUSER), atemio))
 LIBRTMPDUMP_VER = 6f6bb1353fc84f4cc37138baa99f586750028a01
 LIBRTMPDUMP_URL = git://git.ffmpeg.org/rtmpdump
-LIBRTMPDUMP_PATCH = rtmpdump-2.4.patch
-#LIBRTMPDUMP_PATCH = rtmpdump-2.6.patch
+#LIBRTMPDUMP_PATCH = rtmpdump-2.4.patch
+LIBRTMPDUMP_PATCH = rtmpdump-2.6.patch
+EXTRA = $(D)/gnutls
 else
 LIBRTMPDUMP_VER = ad70c64
 LIBRTMPDUMP_URL = https://github.com/oe-alliance/rtmpdump.git
 LIBRTMPDUMP_PATCH = rtmpdump-2.4.patch
+EXTRA =
 endif
 LIBRTMPDUMP_SOURCE = librtmpdump-$(LIBRTMPDUMP_VER).tar.bz2
 
 $(ARCHIVE)/$(LIBRTMPDUMP_SOURCE):
 	$(SCRIPTS_DIR)/get-git-archive.sh $(LIBRTMPDUMP_URL) $(LIBRTMPDUMP_VER) $(notdir $@) $(ARCHIVE)
 
-$(D)/librtmpdump: $(D)/bootstrap $(D)/gnutls $(D)/zlib $(D)/openssl $(ARCHIVE)/$(LIBRTMPDUMP_SOURCE)
+$(D)/librtmpdump: $(D)/bootstrap $(EXTRA) $(D)/zlib $(D)/openssl $(ARCHIVE)/$(LIBRTMPDUMP_SOURCE)
 	$(START_BUILD)
 	$(REMOVE)/librtmpdump-$(LIBRTMPDUMP_VER)
 	$(UNTAR)/$(LIBRTMPDUMP_SOURCE)

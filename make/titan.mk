@@ -2,6 +2,170 @@
 # titan
 #
 
+#
+# titan
+#
+TITAN_VER = 2.02
+
+TITAN_DEPS     = $(D)/bootstrap
+TITAN_DEPS    += $(KERNEL)
+TITAN_DEPS    += $(D)/libopenthreads
+TITAN_DEPS    += $(D)/system-tools
+TITAN_DEPS    += $(D)/module_init_tools
+TITAN_DEPS    += $(LIRC)
+TITAN_DEPS    += $(D)/libpng
+TITAN_DEPS    += $(D)/freetype
+TITAN_DEPS    += $(D)/libjpeg
+TITAN_DEPS    += $(D)/zlib
+TITAN_DEPS    += $(D)/openssl
+TITAN_DEPS    += $(D)/timezone
+TITAN_DEPS    += $(D)/tools-titan-tools
+
+T_CPPFLAGS    += -DSH4
+#T_CPPFLAGS    += -DSH4NEW
+T_CPPFLAGS    += -DSSLNEW
+T_CPPFLAGS    += -DDDTBUILD
+T_CPPFLAGS    += -DDVDPLAYER 
+T_CPPFLAGS    += -DCAMSUPP
+T_LINKFLAGS    = -lm -lpthread -ldl -lpng -lfreetype -ldreamdvd -ljpeg -lz -lmmeimage -lipkg
+
+ifeq ($(MEDIAFW), eplayer3)
+T_CONFIG_OPTS += --enable-eplayer3
+#TITAN_DEPS    += $(D)/tools-exteplayer3
+TITAN_DEPS    += $(D)/libcurl
+TITAN_DEPS    += $(D)/tools-exteplayer3
+TITAN_DEPS    += $(D)/libcurl
+TITAN_DEPS    += $(D)/ffmpeg
+endif
+
+ifeq ($(MEDIAFW), gstreamer)
+TITAN_DEPS    += $(D)/gstreamer $(D)/gst_plugins_base $(D)/gst_plugins_multibox_dvbmediasink
+TITAN_DEPS    += $(D)/gst_plugins_good $(D)/gst_plugins_bad $(D)/gst_plugins_ugly
+TITAN_DEPS_   += $(D)/gstreamer $(D)/gst_plugins_base $(D)/gst_plugins_multibox_dvbmediasink
+TITAN_DEPS    += $(D)/gst_plugins_good $(D)/gst_plugins_bad $(D)/gst_plugins_ugly
+endif
+
+ifeq ($(MEDIAFW), gst-eplayer3)
+#TITAN_DEPS    += $(D)/tools-exteplayer3
+TITAN_DEPS    += $(D)/libcurl
+TITAN_DEPS    += $(D)/gstreamer $(D)/gst_plugins_base $(D)/gst_plugins_multibox_dvbmediasink
+TITAN_DEPS    += $(D)/gst_plugins_good $(D)/gst_plugins_bad $(D)/gst_plugins_ugly
+TITAN_DEPS    += $(D)/tools-exteplayer3
+TITAN_DEPS    += $(D)/libcurl
+TITAN_DEPS    += $(D)/ffmpeg
+TITAN_DEPS_   += $(D)/gstreamer $(D)/gst_plugins_base $(D)/gst_plugins_multibox_dvbmediasink
+TITAN_DEPS    += $(D)/gst_plugins_good $(D)/gst_plugins_bad $(D)/gst_plugins_ugly
+
+T_CPPFLAGS    += -DEPLAYER3
+T_CPPFLAGS    += -DEXTEPLAYER3
+T_CPPFLAGS    += -DEPLAYER4
+T_CPPFLAGS    += -DEXTGST
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/gstreamer-1.0
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/glib-2.0
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/libxml2
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/lib/glib-2.0/include
+#T_CPPFLAGS    += -I$(TOOLS_DIR)/exteplayer3/include
+T_CPPFLAGS    += -I$(SOURCE_DIR)/titan/libeplayer3/include
+T_LINKFLAGS   += -lssl -leplayer3 -lcrypto -lcurl -lglib-2.0 -lgobject-2.0 -lgio-2.0 -lgstreamer-1.0
+#T_LINKFLAGS   = -lglib-2.0 -lgobject-2.0 -lxml2 -lgstreamer-1.0 -leplayer3 -lpthread -ldl -lm -lz -lpng -lfreetype -ldreamdvd -ljpeg -lssl -lcrypto -lcurl -lipkg -lmmeimage
+endif
+
+TITAN_DEPS    += $(LOCAL_TITAN_DEPS)
+
+ifeq ($(IMAGE), titan-wlandriver)
+TITAN_DEPS    += $(D)/wpa_supplicant $(D)/wireless_tools
+endif
+
+ifeq ($(EXTERNAL_LCD), graphlcd)
+T_CONFIG_OPTS += --with-graphlcd
+TITAN_DEPS    += $(D)/graphlcd
+endif
+
+ifeq ($(EXTERNAL_LCD), lcd4linux)
+T_CONFIG_OPTS += --with-lcd4linux
+TITAN_DEPS    += $(D)/lcd4linux
+endif
+
+ifeq ($(EXTERNAL_LCD), both)
+T_CONFIG_OPTS += --with-graphlcd
+TITAN_DEPS    += $(D)/graphlcd
+T_CONFIG_OPTS += --with-lcd4linux
+TITAN_DEPS    += $(D)/lcd4linux
+endif
+
+T_CONFIG_OPTS +=$(LOCAL_TITAN_BUILD_OPTIONS)
+
+T_CPPFLAGS    += -DSH4
+#T_CPPFLAGS    += -DSH4NEW
+T_CPPFLAGS    += -DSSLNEW
+T_CPPFLAGS    += -DDDTBUILD
+T_CPPFLAGS    += -DDVDPLAYER 
+T_CPPFLAGS    += -DCAMSUPP
+T_LINKFLAGS    += -lm -lpthread -ldl -lpng -lfreetype -ldreamdvd -ljpeg -lz -lmmeimage -lipkg
+
+ifeq ($(MEDIAFW), eplayer3)
+T_CPPFLAGS    += -DEPLAYER3
+T_CPPFLAGS    += -DEXTEPLAYER3
+#T_CPPFLAGS    += -I$(TOOLS_DIR)/exteplayer3/include
+T_CPPFLAGS    += -I$(SOURCE_DIR)/titan/libeplayer3/include
+T_LINKFLAGS   += -lssl -leplayer3 -lcrypto -lcurl
+endif
+
+ifeq ($(MEDIAFW), gstreamer)
+T_CPPFLAGS    += -DEPLAYER4
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/gstreamer-1.0
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/glib-2.0
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/libxml2
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/lib/glib-2.0/include
+T_LINKFLAGS   += -lglib-2.0 -lgobject-2.0 -lgio-2.0 -lgstreamer-1.0
+endif
+
+ifeq ($(MEDIAFW), gst-explayer3)
+T_CPPFLAGS    += -DEPLAYER3
+T_CPPFLAGS    += -DEXTEPLAYER3
+T_CPPFLAGS    += -DEPLAYER4
+T_CPPFLAGS    += -DEXTGST
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/gstreamer-1.0
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/glib-2.0
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/libxml2
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/lib/glib-2.0/include
+#T_CPPFLAGS    += -I$(TOOLS_DIR)/exteplayer3/include
+T_CPPFLAGS    += -I$(SOURCE_DIR)/titan/libeplayer3/include
+T_LINKFLAGS   += -lssl -leplayer3 -lcrypto -lcurl -lglib-2.0 -lgobject-2.0 -lgio-2.0 -lgstreamer-1.0
+
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/openssl
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/curl
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/openssl
+T_CPPFLAGS    += -I$(SOURCE_DIR)/titan/libeplayer3/include
+T_CPPFLAGS    += -I$(SOURCE_DIR)/titan/libdreamdvd
+T_CPPFLAGS    += -I$(SOURCE_DIR)/titan/include
+T_CPPFLAGS    += -I$(SOURCE_DIR)/titan
+
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/lib/gstreamer-1.0/include
+
+endif
+
+T_CPPFLAGS    += -Wno-unused-but-set-variable
+T_CPPFLAGS    += -I$(DRIVER_DIR)/include
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/freetype2
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/openssl
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/libpng16
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/dreamdvd
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/libipkg
+T_CPPFLAGS    += -I$(KERNEL_DIR)/include
+T_CPPFLAGS    += -I$(DRIVER_DIR)/bpamem
+T_CPPFLAGS    += -I$(APPS_DIR)/tools
+T_CPPFLAGS    += -I$(APPS_DIR)/tools/libmme_image
+T_CPPFLAGS    += -L$(TARGET_DIR)/usr/lib
+T_CPPFLAGS    += -I$(TARGET_DIR)/usr/include/python
+T_CPPFLAGS    += -L$(SOURCE_DIR)/titan/libipkg
+T_CPPFLAGS    += -I$(SOURCE_DIR)/titan/libdreamdvd
+
+T_CPPFLAGS    += $(LOCAL_TITAN_CPPFLAGS)
+T_CPPFLAGS    += $(PLATFORM_CPPFLAGS)
+T_CPPFLAGS    += $(TARGET_CPPFLAGS)
+
 #yaud-titan: yaud-none $(D)/lirc
 
 yaud-titan: yaud-none \
@@ -13,7 +177,7 @@ yaud-titan: yaud-none \
 
 ifeq ($(whoami), $(filter $(whoami), obi))
 # remove djmount not building on linux mint 22.04
-TITAN_DEPS  = bootstrap libcurl curlftpfs rarfs freetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
+TITAN_DEPS  = bootstrap titan-libipkg libcurl curlftpfs rarfs freetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
 else
 TITAN_DEPS  = bootstrap libcurl curlftpfs rarfs djmount freetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
 endif
@@ -29,25 +193,33 @@ $(D)/titan.do_prepare: | $(TITAN_DEPS)
 	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	COMPRESSBIN=gzip; \
 	COMPRESSEXT=gz; \
-	$(if $(UFS910), COMPRESSBIN=lzma;) \
-	$(if $(UFS910), COMPRESSEXT=lzma;) \
+	[ $(BOXTYPE) == "ufs910" ] && COMPRESSBIN=lzma;\
+	[ $(BOXTYPE) == "ufs910" ] && COMPRESSEXT=lzma;\
 	[ -d "$(BUILD_TMP)/BUILD" ] && \
 	(echo "[titan.mk] Kernel COMPRESSBIN=$$COMPRESSBIN"; echo "[titan.mk] Kernel COMPRESSEXT=$$COMPRESSEXT"; cd "$(BUILD_TMP)/BUILD"; rm -f $(BUILD_TMP)/BUILD/uimage.*; dd if=$(TARGET_DIR)/boot/uImage of=uimage.tmp.$$COMPRESSEXT bs=1 skip=64; $$COMPRESSBIN -d uimage.tmp.$$COMPRESSEXT; str="`strings $(BUILD_TMP)/BUILD/uimage.tmp | grep "Linux version 2.6" | sed 's/Linux version //' | sed 's/(.*)//' | sed 's/  / /'`"; code=`"$(SOURCE_DIR)/titan/titan/tools/gettitancode" "$$str"`; code="$$code"UL; echo "[titan.mk] $$str -> $$code"; sed s/"^#define SYSCODE .*"/"#define SYSCODE $$code"/ -i "$(SOURCE_DIR)/titan/titan/titan.c"); \
 	SVNVERSION=`svn info $(SOURCE_DIR)/titan | grep Revision | sed s/'Revision: '//g`; \
 	SVNBOX=ufs910; \
-	$(if $(UFS910), SVNBOX=ufs910;) \
-	$(if $(UFS912), SVNBOX=ufs912;) \
-	$(if $(UFS922), SVNBOX=ufs922;) \
-	$(if $(OCTAGON1008), SVNBOX=atevio700;) \
-	$(if $(FORTIS_HDBOX), SVNBOX=atevio7000;) \
-	$(if $(ATEVIO7500), SVNBOX=atevio7500;) \
-	$(if $(ATEMIO510), SVNBOX=atemio510;) \
-	$(if $(ATEMIO520), SVNBOX=atemio520;) \
-	$(if $(ATEMIO530), SVNBOX=atemio530;) \
-	TPKDIR="/svn/tpk/"$$SVNBOX"-rev"$$SVNVERSION"-secret/sh4/titan"; \
-	(echo "[titan.mk] tpk SVNVERSION=$$SVNVERSION";echo "[titan.mk] tpk TPKDIR=$$TPKDIR"; sed s!"/svn/tpk/.*"!"$$TPKDIR\", 1, 0);"! -i "$(SOURCE_DIR)/titan/titan/extensions.h"; sed s!"svn/tpk/.*"!"$$TPKDIR\") == 0)"! -i "$(SOURCE_DIR)/titan/titan/tpk.h"; sed s/"^#define PLUGINVERSION .*"/"#define PLUGINVERSION $$SVNVERSION"/ -i "$(SOURCE_DIR)/titan/titan/struct.h"); \
-	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
-	ln -s $(SOURCE_DIR)/titan/libdreamdvd $(SOURCE_DIR)/titan/titan; \
+	[ $(BOXTYPE) == "ufs910" ] && SVNBOX=ufs910;\
+	[ $(BOXTYPE) == "ufs912" ] && SVNBOX=ufs912;\
+	[ $(BOXTYPE) == "ufs913" ] && SVNBOX=ufs913;\
+	[ $(BOXTYPE) == "ufs922" ] && SVNBOX=ufs922;\
+	[ $(BOXTYPE) == "octagon1008" ] && SVNBOX=atevio700;\
+	[ $(BOXTYPE) == "fortis_hdbox" ] && SVNBOX=atevio7000;\
+	[ $(BOXTYPE) == "atevio7500" ] && SVNBOX=atevio7500;\
+	[ $(BOXTYPE) == "atemio510" ] && SVNBOX=atemio510;\
+	[ $(BOXTYPE) == "atemio520" ] && SVNBOX=atemio520;\
+	[ $(BOXTYPE) == "atemio530" ] && SVNBOX=atemio530;\
+#	not used anymore default pfad is /svn/tpk/nightly-$cpu-secret; \
+#	TPKDIR="/svn/tpk/"$$SVNBOX"-rev"$$SVNVERSION"-secret/sh4/titan"; \
+#	(echo "[titan.mk] tpk SVNVERSION=$$SVNVERSION";echo "[titan.mk] tpk TPKDIR=$$TPKDIR"; sed s!"/svn/tpk/.*"!"$$TPKDIR\", 1, 0);"! -i "$(SOURCE_DIR)/titan/titan/extensions.h"; sed s!"svn/tpk/.*"!"$$TPKDIR\") == 0)"! -i "$(SOURCE_DIR)/titan/titan/tpk.h"; sed s/"^#define PLUGINVERSION .*"/"#define PLUGINVERSION $$SVNVERSION"/ -i "$(SOURCE_DIR)/titan/titan/struct.h"); \
+	(echo "[titan.mk] tpk SVNVERSION=$$SVNVERSION"; sed s/"^#define PLUGINVERSION .*"/"#define PLUGINVERSION $$SVNVERSION"/ -i "$(SOURCE_DIR)/titan/titan/struct.h"); \
+	echo BOXTYPE=$(BOXTYPE)
+	pwd
+	cp $(SOURCE_DIR)/titan/titan/Makefile.am.4.3 $(SOURCE_DIR)/titan/titan/Makefile.am; \
+	echo >> Makefile.am; \
+	echo "titan_LDADD = $(T_LINKFLAGS)" >> $(SOURCE_DIR)/titan/titan/Makefile.am; \
+#	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
+#	ln -s $(SOURCE_DIR)/titan/libdreamdvd $(SOURCE_DIR)/titan/titan; \
 	touch $@
 	rm -f $(BUILD_TMP)/BUILD/uimage.*
 
@@ -64,19 +236,19 @@ $(SOURCE_DIR)/titan/titan/config.status:
 			--host=$(TARGET) \
 			--build=$(BUILD) \
 			--prefix=/usr/local \
-			PKG_CONFIG=$(HOSTPREFIX)/bin/$(TARGET)-pkg-config \
-			PKG_CONFIG_PATH=$(TARGET_DIR)/usr/lib/pkgconfig \
-			CPPFLAGS="$(N_CPPFLAGS)"
-		$(MAKE)
+			$(TITAN_OPT_OPTION) \
+			PKG_CONFIG=$(PKG_CONFIG) \
+			CPPFLAGS="$(T_CPPFLAGS)"
+		$(MAKE) linux CC=$(TARGET)-gcc CPPFLAGS="$(T_CPPFLAGS) -fPIC" LDFLAGS="-L$(TARGET_DIR)/usr/lib" BUILDMODE=dynamic PKG_VERSION=$(LUA_VER); \
 	touch $@
 
 $(D)/titan.do_compile: $(SOURCE_DIR)/titan/titan/config.status
 	cd $(SOURCE_DIR)/titan/titan && \
-		$(MAKE)
+		$(MAKE) linux CC=$(TARGET)-gcc CPPFLAGS="$(T_CPPFLAGS) -fPIC" LDFLAGS="-L$(TARGET_DIR)/usr/lib" BUILDMODE=dynamic PKG_VERSION=$(LUA_VER); \
 	touch $@
 
 $(D)/titan: titan.do_prepare titan.do_compile
-	$(MAKE) -C $(SOURCE_DIR)/titan/titan install DESTDIR=$(TARGET_DIR)
+	$(MAKE) CC=$(TARGET)-gcc CPPFLAGS="$(T_CPPFLAGS) -fPIC" LDFLAGS="-L$(TARGET_DIR)/usr/lib" BUILDMODE=dynamic PKG_VERSION=$(LUA_VER) -C $(SOURCE_DIR)/titan/titan install DESTDIR=$(TARGET_DIR)
 	$(TARGET)-strip $(TARGET_DIR)/usr/local/bin/titan
 	touch $@
 	
@@ -250,5 +422,51 @@ $(D)/tuxtxt32bpp: $(D)/bootstrap $(D)/tuxtxtlib
 	$(REWRITE_LIBTOOL)/libtuxtxt32bpp.la
 	$(REMOVE)/tuxtxt
 	touch $@
+
+#
+# titan-libipkg
+#
+$(D)/titan-libipkg.do_prepare: | bootstrap libdvdnav
+	[ -d "$(SOURCE_DIR)/titan" ] && \
+	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
+	[ -d "$(SOURCE_DIR)/titan" ] || \
+	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
+	[ -d "$(SOURCE_DIR)/titan/titan/libipkg" ] || \
+	ln -s $(SOURCE_DIR)/titan/libipkg $(SOURCE_DIR)/titan/titan; \
+	touch $@
+
+$(SOURCE_DIR)/titan/libipkg/config.status:
+	export PATH=$(hostprefix)/bin:$(PATH) && \
+	cd $(SOURCE_DIR)/titan/libipkg && \
+		./autogen.sh; \
+		libtoolize --force && \
+		aclocal -I $(TARGET_DIR)/usr/share/aclocal && \
+		autoconf && \
+		automake --foreign --add-missing && \
+		$(BUILDENV) \
+		./configure \
+			--build=$(BUILD) \
+			--host=$(TARGET) \
+			--prefix=/usr && \
+		$(MAKE) all
+	touch $@
+
+$(D)/titan-libipkg.do_compile: $(SOURCE_DIR)/titan/libipkg/config.status
+	cd $(SOURCE_DIR)/titan/libipkg && \
+		$(MAKE)
+	touch $@
+
+$(D)/titan-libipkg: titan-libipkg.do_prepare titan-libipkg.do_compile
+	$(MAKE) -C $(SOURCE_DIR)/titan/libipkg install DESTDIR=$(TARGET_DIR)
+	touch $@
+
+titan-libipkg-clean:
+	rm -f $(D)/titan-libipkg
+	cd $(SOURCE_DIR)/titan/libipkg && \
+		$(MAKE) clean
+
+titan-libipkg-distclean:
+	rm -f $(D)/titan-libipkg*
+	rm -rf $(SOURCE_DIR)/titan/libipkg	
 
 
