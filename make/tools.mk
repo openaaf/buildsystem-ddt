@@ -44,9 +44,20 @@ endif
 #
 # aio-grab
 #
-$(D)/tools-aio-grab: $(D)/bootstrap $(D)/libpng $(D)/libjpeg
+$(D)/tools-aio-grab1: $(D)/bootstrap $(D)/libpng $(D)/libjpeg
 	$(START_BUILD)
 	set -e; cd $(APPS_DIR)/tools/aio-grab-$(BOXARCH); \
+		$(CONFIGURE_TOOLS) CPPFLAGS="$(CPPFLAGS) -I$(DRIVER_DIR)/bpamem" \
+			--prefix= \
+		; \
+		$(MAKE); \
+		$(MAKE) install DESTDIR=$(TARGET_DIR)
+	$(TOUCH)
+
+$(D)/tools-aio-grab: $(D)/bootstrap $(D)/libpng $(D)/libjpeg
+	$(START_BUILD)
+	$(SET) -e; cd $(TOOLS_DIR)/aio-grab-$(BOXARCH); \
+		if [ ! -d m4 ]; then mkdir m4; fi; \
 		$(CONFIGURE_TOOLS) CPPFLAGS="$(CPPFLAGS) -I$(DRIVER_DIR)/bpamem" \
 			--prefix= \
 		; \

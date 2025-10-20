@@ -1144,37 +1144,6 @@ $(D)/nfs_utils: $(D)/bootstrap $(D)/e2fsprogs $(ARCHIVE)/$(NFS_UTILS_SOURCE)
 	$(REMOVE)/nfs-utils-$(NFS_UTILS_VER)
 	$(TOUCH)
 
-#
-# libevent
-#
-LIBEVENT_VER = 2.0.21-stable
-LIBEVENT_SOURCE = libevent-$(LIBEVENT_VER).tar.gz
-
-$(ARCHIVE)/$(LIBEVENT_SOURCE):
-	$(WGET) https://github.com/downloads/libevent/libevent/$(LIBEVENT_SOURCE)
-
-$(D)/libevent: $(D)/bootstrap $(ARCHIVE)/$(LIBEVENT_SOURCE)
-	$(START_BUILD)
-	$(REMOVE)/libevent-$(LIBEVENT_VER)
-	$(UNTAR)/$(LIBEVENT_SOURCE)
-	set -e; cd $(BUILD_TMP)/libevent-$(LIBEVENT_VER);\
-		$(CONFIGURE) \
-			--prefix=/usr \
-		; \
-		$(MAKE); \
-		$(MAKE) install DESTDIR=$(TARGET_DIR)
-	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libevent.pc
-	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libevent_openssl.pc
-	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libevent_pthreads.pc
-	$(REWRITE_LIBTOOL)/libevent_core.la
-	$(REWRITE_LIBTOOL)/libevent_extra.la
-	$(REWRITE_LIBTOOL)/libevent.la
-	$(REWRITE_LIBTOOL)/libevent_openssl.la
-	$(REWRITE_LIBTOOL)/libevent_pthreads.la
-	$(REMOVE)/libevent-$(LIBEVENT_VER)
-	$(TOUCH)
-
-#
 # libnfsidmap
 #
 LIBNFSIDMAP_VER = 0.25
@@ -1377,46 +1346,23 @@ $(D)/wireless_tools: $(D)/bootstrap $(ARCHIVE)/$(WIRELESS_TOOLS_SOURCE)
 	$(TOUCH)
 
 #
-# libnl
-#
-LIBNL_VER = 2.0
-LIBNL_SOURCE = libnl-$(LIBNL_VER).tar.gz
-
-$(ARCHIVE)/$(LIBNL_SOURCE):
-	$(WGET) https://www.infradead.org/~tgr/libnl/files/$(LIBNL_SOURCE)
-
-$(D)/libnl: $(D)/bootstrap $(D)/openssl $(ARCHIVE)/$(LIBNL_SOURCE)
-	$(START_BUILD)
-	$(REMOVE)/libnl-$(LIBNL_VER)
-	$(UNTAR)/$(LIBNL_SOURCE)
-	set -e; cd $(BUILD_TMP)/libnl-$(LIBNL_VER); \
-		$(CONFIGURE) \
-			--target=$(TARGET) \
-			--prefix=/usr \
-			--bindir=/.remove \
-			--mandir=/.remove \
-			--infodir=/.remove \
-		make; \
-		make install DESTDIR=$(TARGET_DIR)
-	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libnl-$(LIBNL_VER).pc
-	$(REWRITE_LIBTOOL)/libnl.la
-	$(REWRITE_LIBTOOL)/libnl-cli.la
-	$(REWRITE_LIBTOOL)/libnl-genl.la
-	$(REWRITE_LIBTOOL)/libnl-nf.la
-	$(REWRITE_LIBTOOL)/libnl-route.la
-	$(REMOVE)/libnl-$(LIBNL_VER)
-	$(TOUCH)
-
-#
 # wpa_supplicant
 #
+ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
+WPA_SUPPLICANT_VER = 2.9
+else
 WPA_SUPPLICANT_VER = 0.7.3
+endif
 WPA_SUPPLICANT_SOURCE = wpa_supplicant-$(WPA_SUPPLICANT_VER).tar.gz
 
 $(ARCHIVE)/$(WPA_SUPPLICANT_SOURCE):
 	$(WGET) https://w1.fi/releases/$(WPA_SUPPLICANT_SOURCE)
 
+ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
+$(D)/wpa_supplicant: $(D)/bootstrap $(D)/openssl $(D)/wireless_tools $(D)/libnl $(D)/dbus $(ARCHIVE)/$(WPA_SUPPLICANT_SOURCE)
+else
 $(D)/wpa_supplicant: $(D)/bootstrap $(D)/openssl $(D)/wireless_tools $(ARCHIVE)/$(WPA_SUPPLICANT_SOURCE)
+endif
 	$(START_BUILD)
 	$(REMOVE)/wpa_supplicant-$(WPA_SUPPLICANT_VER)
 	$(UNTAR)/$(WPA_SUPPLICANT_SOURCE)
@@ -1433,7 +1379,7 @@ $(D)/wpa_supplicant: $(D)/bootstrap $(D)/openssl $(D)/wireless_tools $(ARCHIVE)/
 		export LIBS="-L$(TARGET_DIR)/usr/lib -Wl,-rpath-link,$(TARGET_DIR)/usr/lib"; \
 		export LDFLAGS="-L$(TARGET_DIR)/usr/lib"; \
 		export DESTDIR=$(TARGET_DIR); \
-		$(MAKE) CC=$(TARGET)-gcc; \
+		$(MAKE) CC=$(TARGET)-gcc DESTDIR=$(TARGET_DIR); \
 		$(MAKE) install BINDIR=/usr/sbin DESTDIR=$(TARGET_DIR)
 	$(REMOVE)/wpa_supplicant-$(WPA_SUPPLICANT_VER)
 	$(TOUCH)

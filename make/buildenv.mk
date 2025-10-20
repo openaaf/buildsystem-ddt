@@ -15,7 +15,9 @@ APPS_DIR              = $(BASE_DIR)/apps
 BUILD_TMP             = $(BASE_DIR)/build_tmp
 DRIVER_DIR            = $(BASE_DIR)/driver
 FLASH_DIR             = $(BASE_DIR)/flash
-SOURCE_DIR            = $(BASE_DIR)/source
+#SOURCE_DIR            = $(BASE_DIR)/source
+SOURCE_DIR            = $(BASE_DIR)/build_source
+TOOLS_DIR             = $(APPS_DIR)/tools
 
 -include $(BASE_DIR)/config
 
@@ -127,12 +129,18 @@ CA_BUNDLE_DIR         = /etc/ssl/certs
 
 # helper-"functions"
 REWRITE_LIBTOOL       = sed -i "s,^libdir=.*,libdir='$(TARGET_DIR)/usr/lib'," $(TARGET_DIR)/usr/lib
+REWRITE_LIBTOOL_NQ    = sed -i "s,^libdir=.*,libdir='$(TARGET_DIR)/usr/lib'," $(TARGET_DIR)/usr/lib
 REWRITE_LIBTOOLDEP    = sed -i -e "s,\(^dependency_libs='\| \|-L\|^dependency_libs='\)/usr/lib,\ $(TARGET_DIR)/usr/lib,g" $(TARGET_DIR)/usr/lib
 REWRITE_PKGCONF       = sed -i "s,^prefix=.*,prefix='$(TARGET_DIR)/usr',"
 
 # unpack tarballs, clean up
 UNTAR                 = tar -C $(BUILD_TMP) -xf $(ARCHIVE)
 REMOVE                = rm -rf $(BUILD_TMP)
+SET                   = $(SILENT)set
+
+CH_DIR                = $(SILENT)set -e; cd $(BUILD_TMP)
+MK_DIR                = mkdir -p $(BUILD_TMP)
+STRIP                 = $(TARGET)-strip
 
 #
 split_deps_dir=$(subst ., ,$(1))
@@ -183,6 +191,34 @@ define post_patch
         echo -e "Patching $(TERM_GREEN_BOLD)$(PKG_NAME)$(TERM_NORMAL) completed"; \
     else \
         echo -e "Patching $(TERM_GREEN_BOLD)$(PKG_NAME) $(PKG_VER)$(TERM_NORMAL) completed"; \
+    fi; \
+    echo
+endef
+
+define apply_patches
+    for i in $(1); do \
+        if [ -d $$i ]; then \
+            for p in $$i/*; do \
+                if [ $${p:0:1} == "/" ]; then \
+                    echo -e "$(TERM_RED)Applying Patch:$(TERM_NORMAL) $$p"; $(APATCH) $$p; \
+                else \
+                    echo -e "$(TERM_RED)Applying Patch:$(TERM_NORMAL) $$p"; $(PATCH)/$$p; \
+                fi; \
+            done; \
+        else \
+            if [ $${i:0:1} == "/" ]; then \
+                echo -e "$(TERM_RED)Applying Patch:$(TERM_NORMAL) $$i"; $(APATCH) $$i; \
+            else \
+                echo -e "$(TERM_RED)Applying Patch:$(TERM_NORMAL) $$i"; $(PATCH)/$$i; \
+            fi; \
+        fi; \
+    done; \
+    if [ '$(1)' -a '$(1)' != ' ' ]; then \
+        if [ $(PKG_VER_HELPER) == "AA" ]; then \
+            echo -e "Patching $(TERM_GREEN_BOLD)$(PKG_NAME)$(TERM_NORMAL) completed."; \
+        else \
+            echo -e "Patching $(TERM_GREEN_BOLD)$(PKG_NAME) $(PKG_VER)$(TERM_NORMAL) completed."; \
+        fi; \
     fi; \
     echo
 endef

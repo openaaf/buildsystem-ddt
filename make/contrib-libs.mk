@@ -990,18 +990,21 @@ $(D)/libconfig: $(D)/bootstrap $(ARCHIVE)/$(LIBCONFIG_SOURCE)
 	$(TOUCH)
 
 #
-# libcurl
+# ca-bundle
 #
-LIBCURL_VER = 7.56.1
-LIBCURL_SOURCE = curl-$(LIBCURL_VER).tar.bz2
-LIBCURL_PATCH = libcurl-$(LIBCURL_VER).patch
-
 $(ARCHIVE)/cacert.pem:
 	$(WGET) https://curl.haxx.se/ca/cacert.pem
 
 $(D)/ca-bundle: $(ARCHIVE)/cacert.pem
 	install -D -m 644 $(ARCHIVE)/cacert.pem $(TARGET_DIR)/$(CA_BUNDLE_DIR)/$(CA_BUNDLE)
 	$(TOUCH)
+
+#
+# libcurl
+#
+LIBCURL_VER = 7.56.1
+LIBCURL_SOURCE = curl-$(LIBCURL_VER).tar.bz2
+LIBCURL_PATCH = libcurl-$(LIBCURL_VER).patch
 
 $(ARCHIVE)/$(LIBCURL_SOURCE):
 	$(WGET) https://curl.haxx.se/download/$(LIBCURL_SOURCE)
@@ -1297,8 +1300,10 @@ $(D)/libiconv: $(D)/bootstrap $(ARCHIVE)/$(LIBICONV_SOURCE)
 #
 # expat
 #
-EXPAT_VER = 2.2.0
+#EXPAT_VER = 2.2.0
+EXPAT_VER = 2.5.0
 EXPAT_SOURCE = expat-$(EXPAT_VER).tar.bz2
+EXPAT_PATCH  = expat-$(EXPAT_VER)-libtool-tag.patch
 
 $(ARCHIVE)/$(EXPAT_SOURCE):
 	$(WGET) https://sourceforge.net/projects/expat/files/expat/$(EXPAT_VER)/$(EXPAT_SOURCE)
@@ -1680,10 +1685,8 @@ ifeq ($(BOXTYPE), $(filter $(BOXTYPE), spark))
 FFMPEG_EXTERN = $(D)/libass
 endif
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
-#FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2 $(D)/libbluray
-#FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
-FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
-FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
+FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2 $(D)/libbluray
+FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
 endif
 endif
 
@@ -2506,7 +2509,7 @@ $(D)/libopenthreads: $(D)/bootstrap $(ARCHIVE)/$(LIBOPENTHREADS_SOURCE)
 #
 # librtmpdump
 #
-ifeq ($(BUILDUSER), $(filter $(BUILDUSER), atemio))
+ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
 LIBRTMPDUMP_VER = 6f6bb1353fc84f4cc37138baa99f586750028a01
 LIBRTMPDUMP_URL = git://git.ffmpeg.org/rtmpdump
 #LIBRTMPDUMP_PATCH = rtmpdump-2.4.patch
@@ -2516,7 +2519,7 @@ else
 LIBRTMPDUMP_VER = ad70c64
 LIBRTMPDUMP_URL = https://github.com/oe-alliance/rtmpdump.git
 LIBRTMPDUMP_PATCH = rtmpdump-2.4.patch
-EXTRA =
+EXTRA = ""
 endif
 LIBRTMPDUMP_SOURCE = librtmpdump-$(LIBRTMPDUMP_VER).tar.bz2
 
@@ -2975,3 +2978,339 @@ $(D)/glib_networking: $(D)/bootstrap $(D)/gnutls $(D)/libglib2 $(ARCHIVE)/$(GLIB
 		$(MAKE) install prefix=$(TARGET_DIR) giomoduledir=$(TARGET_DIR)/usr/lib/gio/modules itlocaledir=$(TARGET_DIR)/.remove
 	$(REMOVE)/glib-networking-$(GLIB_NETWORKING_VER)
 	$(TOUCH)
+
+#
+# libudfread
+#
+LIBUDFREAD_VER_MAJOR = 1
+LIBUDFREAD_VER_MINOR = 0
+LIBUDFREAD_VER_MICRO = 0
+LIBUDFREAD_VER = $(LIBUDFREAD_VER_MAJOR).$(LIBUDFREAD_VER_MINOR).$(LIBUDFREAD_VER_MICRO)
+LIBUDFREAD_URL = https://code.videolan.org/videolan/libudfread.git
+LIBUDFREAD_PATCH =
+
+$(D)/libudfread: $(D)/bootstrap
+	$(START_BUILD)
+	$(REMOVE)/libudfread-$(LIBUDFREAD_VER)
+	$(SET) -e; if [ -d $(ARCHIVE)/libudfread.git ]; \
+		then cd $(ARCHIVE)/libudfread.git; git pull $(MINUS_Q); \
+		else cd $(ARCHIVE); git clone $(MINUS_Q) $(LIBUDFREAD_URL) libudfread.git; \
+		fi
+	$(SILENT)cp -ra $(ARCHIVE)/libudfread.git $(BUILD_TMP)/libudfread-$(LIBUDFREAD_VER)
+	$(CH_DIR)/libudfread-$(LIBUDFREAD_VER); \
+		$(call apply_patches, $(LIBUDFREAD_PATCH)); \
+		autoreconf -fi $(SILENT_OPT); \
+		$(CONFIGURE) \
+			--prefix=/usr \
+			--mandir=/.remove \
+			--infodir=/.remove \
+			--datarootdir=/.remove \
+		; \
+		$(MAKE); \
+		$(MAKE) install DESTDIR=$(TARGET_DIR)
+	$(REWRITE_LIBTOOL)/libudfread.la
+	$(REWRITE_LIBTOOLDEP)/libudfread.la
+	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,psktool gnutls-cli-debug certtool srptool ocsptool gnutls-serv gnutls-cli)
+	$(REMOVE)/libudfread-$(LIBUDFREAD_VER)
+	$(TOUCH)
+
+#
+# uchardet
+#
+UCHARDET_VER = 0.0.6
+UCHARDET_SOURCE = uchardet-$(UCHARDET_VER).tar.xz
+UCHARDET_PATCH =
+
+$(ARCHIVE)/$(UCHARDET_SOURCE):
+	$(WGET) https://www.freedesktop.org/software/uchardet/releases/$(UCHARDET_SOURCE)
+
+$(D)/uchardet: $(D)/bootstrap $(ARCHIVE)/$(UCHARDET_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/uchardet-$(UCHARDET_VER)
+	$(UNTAR)/$(UCHARDET_SOURCE)
+	$(CH_DIR)/uchardet-$(UCHARDET_VER); \
+		$(call apply_patches, $(UCHARDET_PATCH)); \
+		rm CMakeFiles/* -rf CMakeCache.txt cmake_install.cmake; \
+		cmake . -DCMAKE_BUILD_TYPE=Release \
+			-DCMAKE_SYSTEM_NAME="Linux" \
+			-DCMAKE_INSTALL_PREFIX="/usr" \
+			-DCMAKE_C_COMPILER="$(TARGET)-gcc" \
+			-DCMAKE_CXX_COMPILER="$(TARGET)-g++" \
+			-DCMAKE_INCLUDE_PATH="$(TARGET_DIR)/usr/include" \
+		; \
+		$(MAKE); \
+		$(MAKE) install DESTDIR=$(TARGET_DIR)
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/uchardet.pc
+	$(REMOVE)/uchardet-$(UCHARDET_VER)
+	$(TOUCH)
+
+#
+# libcap
+#
+LIBCAP_VER = 2.25
+LIBCAP_SOURCE = libcap-$(LIBCAP_VER).tar.gz
+LIBCAP_PATCH  = libcap-$(LIBCAP_VER)-cross_compile.patch
+LIBCAP_PATCH += libcap-$(LIBCAP_VER)-old_kernel.patch
+
+$(ARCHIVE)/$(LIBCAP_SOURCE):
+	$(WGET) https://git.kernel.org/pub/scm/libs/libcap/libcap.git/snapshot/$(LIBCAP_SOURCE)
+
+$(D)/libcap: $(D)/bootstrap $(D)/libglib2 $(ARCHIVE)/$(LIBCAP_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/libcap-$(LIBCAP_VER)
+	$(UNTAR)/$(LIBCAP_SOURCE)
+	$(CH_DIR)/libcap-$(LIBCAP_VER); \
+		$(call apply_patches, $(LIBCAP_PATCH)); \
+		sed -e 's,:=,?=,g' -i Make.Rules; \
+		sed -e 's,^BUILD_CFLAGS ?= $(.*CFLAGS),BUILD_CFLAGS := $(BUILD_CFLAGS),' -i Make.Rules; \
+		sed -e '/shell gperf/cifeq (,yes)' -i libcap/Makefile; \
+		$(MAKE) CC=$(TARGET)-gcc INDENT= lib=/usr/lib RAISE_SETFCAP=no DYNAMIC=yes; \
+		$(MAKE) RAISE_SETFCAP=no prefix=/usr lib=lib DESTDIR=$(TARGET_DIR) SBINDIR=/usr/sbin install
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libcap.pc
+	$(REMOVE)/libcap-$(LIBCAP_VER)
+	$(TOUCH)
+
+#
+# libevent
+#
+LIBEVENT_VER = 2.0.21-stable
+LIBEVENT_SOURCE = libevent-$(LIBEVENT_VER).tar.gz
+
+$(ARCHIVE)/$(LIBEVENT_SOURCE):
+	$(WGET) https://github.com/downloads/libevent/libevent/$(LIBEVENT_SOURCE)
+
+$(D)/libevent2: $(D)/bootstrap $(ARCHIVE)/$(LIBEVENT_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/libevent-$(LIBEVENT_VER)
+	$(UNTAR)/$(LIBEVENT_SOURCE)
+	set -e; cd $(BUILD_TMP)/libevent-$(LIBEVENT_VER);\
+		$(CONFIGURE) \
+			--prefix=/usr \
+		; \
+		$(MAKE); \
+		$(MAKE) install DESTDIR=$(TARGET_DIR)
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libevent.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libevent_openssl.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libevent_pthreads.pc
+	$(REWRITE_LIBTOOL)/libevent_core.la
+	$(REWRITE_LIBTOOL)/libevent_extra.la
+	$(REWRITE_LIBTOOL)/libevent.la
+	$(REWRITE_LIBTOOL)/libevent_openssl.la
+	$(REWRITE_LIBTOOL)/libevent_pthreads.la
+	$(REMOVE)/libevent-$(LIBEVENT_VER)
+	$(TOUCH)
+
+#
+# libevent
+#
+LIBEVENT_VER   = 2.2
+LIBEVENT_URL   = https://github.com/libevent/libevent.git
+LIBEVENT_PATCH = libevent-$(LIBEVENT_VER).patch
+
+$(D)/libevent: $(D)/bootstrap $(D)/openssl
+	$(START_BUILD)
+	$(REMOVE)/libevent-$(LIBEVENT_VER)
+	$(SET) -e; if [ -d $(ARCHIVE)/libevent.git ]; \
+		then cd $(ARCHIVE)/libevent.git; git pull $(MINUS_Q); \
+		else cd $(ARCHIVE); git clone $(MINUS_Q) $(LIBEVENT_URL) libevent.git; \
+		fi
+	$(SILENT)cp -ra $(ARCHIVE)/libevent.git $(BUILD_TMP)/libevent-$(LIBEVENT_VER)
+	$(CH_DIR)/libevent-$(LIBEVENT_VER); \
+		$(call apply_patches, $(LIBEVENT_PATCH)); \
+		autoreconf -fi $(SILENT_OPT); \
+		$(CONFIGURE) \
+			--prefix=/usr \
+			--enable-silent-rules \
+		; \
+		$(MAKE); \
+		$(MAKE) install DESTDIR=$(TARGET_DIR)
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libevent.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libevent_openssl.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libevent_pthreads.pc
+	$(REWRITE_LIBTOOL)/libevent_core.la
+	$(REWRITE_LIBTOOL)/libevent_extra.la
+	$(REWRITE_LIBTOOL)/libevent.la
+	$(REWRITE_LIBTOOL)/libevent_openssl.la
+	$(REWRITE_LIBTOOL)/libevent_pthreads.la
+	$(REMOVE)/libevent-$(LIBEVENT_VER)
+	$(TOUCH)
+
+#
+# libnl
+#
+LIBNL_VER = 3.2.25
+LIBNL_SOURCE = libnl-$(LIBNL_VER).tar.gz
+
+$(ARCHIVE)/$(LIBNL_SOURCE):
+	$(WGET) https://www.infradead.org/~tgr/libnl/files/$(LIBNL_SOURCE)
+
+$(D)/libnl: $(D)/bootstrap $(D)/openssl $(ARCHIVE)/$(LIBNL_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/libnl-$(LIBNL_VER)
+	$(UNTAR)/$(LIBNL_SOURCE)
+	$(CH_DIR)/libnl-$(LIBNL_VER); \
+		$(CONFIGURE) \
+			--build=$(BUILD) \
+			--host=$(TARGET) \
+			--prefix=/usr \
+			--bindir=/.remove \
+			--mandir=/.remove \
+			--infodir=/.remove \
+		make $(SILENT_OPT); \
+		make install $(SILENT_OPT) DESTDIR=$(TARGET_DIR)
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libnl-3.0.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libnl-cli-3.0.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libnl-genl-3.0.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libnl-nf-3.0.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libnl-route-3.0.pc
+	$(REWRITE_LIBTOOL)/libnl-3.la
+	$(REWRITE_LIBTOOL)/libnl-cli-3.la
+	$(REWRITE_LIBTOOL)/libnl-genl-3.la
+	$(REWRITE_LIBTOOL)/libnl-idiag-3.la
+	$(REWRITE_LIBTOOL)/libnl-nf-3.la
+	$(REWRITE_LIBTOOL)/libnl-route-3.la
+	$(REMOVE)/libnl-$(LIBNL_VER)
+	$(TOUCH)
+
+#
+# mpg123
+#
+MPG123_VER = 1.28.2
+MPG123_SOURCE = mpg123-$(MPG123_VER).tar.bz2
+
+$(ARCHIVE)/$(MPG123_SOURCE):
+	$(WGET) https://sourceforge.net/projects/mpg123/files/mpg123/$(MPG123_VER)/$(MPG123_SOURCE)
+
+$(D)/mpg123: $(D)/bootstrap $(ARCHIVE)/$(MPG123_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/mpg123-$(MPG123_VER)
+	$(UNTAR)/$(MPG123_SOURCE)
+	$(CH_DIR)/mpg123-$(MPG123_VER); \
+		$(CONFIGURE) \
+			--build=$(BUILD) \
+			--host=$(TARGET) \
+			--target=$(TARGET) \
+			--prefix=/usr \
+			--bindir=/.remove \
+			--mandir=/.remove \
+			--docdir=/.remove \
+			--infodir=/.remove \
+			--with-audio=alsa \
+			--with-audio=oss \
+			--with-default-audio=alsa \
+			--with-default-audio=oss \
+		make $(SILENT_OPT); \
+		make install $(SILENT_OPT) DESTDIR=$(TARGET_DIR)
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libmpg123.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libout123.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libsyn123.pc
+	$(REWRITE_LIBTOOL)/libmpg123.la
+	$(REWRITE_LIBTOOL)/libout123.la
+	$(REWRITE_LIBTOOL)/libsyn123.la
+	$(REMOVE)/mpg123-$(MPG123_VER)
+	$(TOUCH)
+
+#
+# a52dec
+#
+A52DEC_VER = 0.7.4
+A52DEC_SOURCE = a52dec-$(A52DEC_VER).tar.gz
+
+$(ARCHIVE)/$(A52DEC_SOURCE):
+	$(WGET) https://ftp.osuosl.org/pub/blfs/conglomeration/a52dec/$(A52DEC_SOURCE)
+
+$(D)/a52dec: $(D)/bootstrap $(ARCHIVE)/$(A52DEC_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/a52dec-$(A52DEC_VER)
+	$(UNTAR)/$(A52DEC_SOURCE)
+	$(CH_DIR)/a52dec-$(A52DEC_VER); \
+		$(CONFIGURE) \
+			--build=$(BUILD) \
+			--host=$(TARGET) \
+			--target=$(TARGET) \
+			--disable-al-audio \
+			--disable-solaris-audio \
+			--disable-win \
+			--prefix=/usr \
+			--bindir=/.remove \
+			--mandir=/.remove \
+			--infodir=/.remove \
+		make $(SILENT_OPT); \
+		make install $(SILENT_OPT) DESTDIR=$(TARGET_DIR)
+	$(REWRITE_LIBTOOL)/liba52.la
+	$(REMOVE)/a52dec-$(A52DEC_VER)
+	$(TOUCH)
+
+#
+# amrnb
+#
+AMRNB_VER = 11.0.0.0
+AMRNB_SOURCE = amrnb-$(AMRNB_VER).tar.bz2
+
+$(ARCHIVE)/$(AMRNB_SOURCE):
+	$(WGET) http://www.penguin.cz/~utx/ftp/amr/$(AMRNB_SOURCE)
+
+$(D)/amrnb: $(D)/bootstrap $(ARCHIVE)/$(AMRNB_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/amrnb-$(AMRNB_VER)
+	$(UNTAR)/$(AMRNB_SOURCE)
+	$(CH_DIR)/amrnb-$(AMRNB_VER); \
+		autoreconf -fi $(SILENT_OPT); \
+		$(CONFIGURE) \
+			--build=$(BUILD) \
+			--host=$(TARGET) \
+			--target=$(TARGET) \
+			--prefix=/usr \
+			--bindir=/.remove \
+			--mandir=/.remove \
+			--docdir=/.remove \
+			--infodir=/.remove \
+		make $(SILENT_OPT); \
+		make install $(SILENT_OPT) DESTDIR=$(TARGET_DIR)
+	$(REMOVE)/amrnb-$(AMRNB_VER)
+	$(TOUCH)
+
+#
+# libwrap
+#
+LIBWRAP_VER = 7.6
+LIBWRAP_SOURCE = tcp_wrappers_$(LIBWRAP_VER).tar.bz2
+
+$(ARCHIVE)/$(LIBWRAP_SOURCE):
+	$(WGET) https://ftp.osuosl.org/pub/blfs/conglomeration/tcp_wrappers/$(LIBWRAP_SOURCE)
+
+$(D)/libwrap: $(D)/bootstrap $(ARCHIVE)/$(LIBWRAP_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/libwrap-$(LIBWRAP_VER)
+	$(UNTAR)/$(LIBWRAP_SOURCE)
+	$(CH_DIR)/tcp_wrappers_$(LIBWRAP_VER); \
+		make all; \
+		make install $(SILENT_OPT) DESTDIR=$(TARGET_DIR)
+	$(REWRITE_LIBTOOL)/libwrap.la
+	$(REMOVE)/libwrap-$(LIBWRAP_VER)
+	$(TOUCH)
+
+#
+# libxmlccwrap
+#
+LIBXMLCCWRAP_VER = 0.0.12
+LIBXMLCCWRAP_SOURCE = libxmlccwrap-$(LIBXMLCCWRAP_VER).tar.gz
+
+$(ARCHIVE)/$(LIBXMLCCWRAP_SOURCE):
+	$(WGET) http://www.ant.uni-bremen.de/whomes/rinas/libxmlccwrap/download/$(LIBXMLCCWRAP_SOURCE)
+
+$(D)/libxmlccwrap: $(D)/bootstrap $(D)/libxml2 $(D)/libxslt $(ARCHIVE)/$(LIBXMLCCWRAP_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/libxmlccwrap-$(LIBXMLCCWRAP_VER)
+	$(UNTAR)/$(LIBXMLCCWRAP_SOURCE)
+	$(CH_DIR)/libxmlccwrap-$(LIBXMLCCWRAP_VER); \
+		$(CONFIGURE) \
+			--target=$(TARGET) \
+			--prefix=/usr \
+		; \
+		$(MAKE) all; \
+		$(MAKE) install DESTDIR=$(TARGET_DIR)
+	$(REWRITE_LIBTOOL)/libxmlccwrap.la
+	$(REMOVE)/libxmlccwrap-$(LIBXMLCCWRAP_VER)
+	$(TOUCH)
+
