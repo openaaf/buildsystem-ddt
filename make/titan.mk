@@ -28,25 +28,23 @@ T_LINKFLAGS    = -lm -lpthread -ldl -lpng -lfreetype -ldreamdvd -ljpeg -lz -lmme
 
 ifeq ($(MEDIAFW), eplayer3)
 #T_CONFIG_OPTS += --enable-eplayer3
-#TITAN_DEPS    += $(D)/tools-exteplayer3
-##TITAN_DEPS    += $(D)/titan-libeplayer3
-TITAN_DEPS    += $(D)/tools-libeplayer3
+MEDIAFW_DEP   += $(D)/tools-libeplayer3
+#MEDIAFW_DEP    += $(D)/tools-exteplayer3
+##MEDIAFW_DEP    += $(D)/titan-libeplayer3
 endif
 
 ifeq ($(MEDIAFW), gstreamer)
-TITAN_DEPS    += $(D)/gstreamer $(D)/gst_plugins_base $(D)/gst_plugins_multibox_dvbmediasink
-TITAN_DEPS    += $(D)/gst_plugins_good $(D)/gst_plugins_bad $(D)/gst_plugins_ugly
-TITAN_DEPS_   += $(D)/gstreamer $(D)/gst_plugins_base $(D)/gst_plugins_multibox_dvbmediasink
-TITAN_DEPS    += $(D)/gst_plugins_good $(D)/gst_plugins_bad $(D)/gst_plugins_ugly
+MEDIAFW_DEP    += $(D)/gstreamer $(D)/gst_plugins_base $(D)/gst_plugins_multibox_dvbmediasink
+MEDIAFW_DEP    += $(D)/gst_plugins_good $(D)/gst_plugins_bad $(D)/gst_plugins_ugly
 endif
 
 #ifeq ($(MEDIAFW), gst-eplayer3-dual)
 ifeq ($(MEDIAFW), gst-eplayer3)
-#TITAN_DEPS    += $(D)/tools-exteplayer3
-TITAN_DEPS    += $(D)/gstreamer $(D)/gst_plugins_base $(D)/gst_plugins_multibox_dvbmediasink
-TITAN_DEPS    += $(D)/gst_plugins_good $(D)/gst_plugins_bad $(D)/gst_plugins_ugly
-##TITAN_DEPS    += $(D)/titan-libeplayer3
-TITAN_DEPS    += $(D)/tools-libeplayer3
+MEDIAFW_DEP    += $(D)/gstreamer $(D)/gst_plugins_base $(D)/gst_plugins_multibox_dvbmediasink
+MEDIAFW_DEP    += $(D)/gst_plugins_good $(D)/gst_plugins_bad $(D)/gst_plugins_ugly
+MEDIAFW_DEP    += $(D)/tools-libeplayer3
+#MEDIAFW_DEP    += $(D)/tools-exteplayer3
+##MEDIAFW_DEP    += $(D)/titan-libeplayer3
 
 T_CPPFLAGS    += -DEPLAYER3
 T_CPPFLAGS    += -DEXTEPLAYER3
@@ -62,6 +60,7 @@ T_LINKFLAGS   += -lssl -leplayer3 -lcrypto -lcurl -lglib-2.0 -lgobject-2.0 -lgio
 #T_LINKFLAGS   = -lglib-2.0 -lgobject-2.0 -lxml2 -lgstreamer-1.0 -leplayer3 -lpthread -ldl -lm -lz -lpng -lfreetype -ldreamdvd -ljpeg -lssl -lcrypto -lcurl -lipkg -lmmeimage
 endif
 
+TITAN_DEPS    += $(MEDIAFW_DEP)
 TITAN_DEPS    += $(LOCAL_TITAN_DEPS)
 
 ifeq ($(IMAGE), titan-wlandriver)
@@ -213,7 +212,19 @@ $(D)/titan.do_prepare: | $(TITAN_DEPS)
 	echo "titan_LDADD = $(T_LINKFLAGS)" >> $(SOURCE_DIR)/titan/titan/Makefile.am; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
 	ln -s $(SOURCE_DIR)/titan/libdreamdvd $(SOURCE_DIR)/titan/titan; \
-	echo 11111111111 $(T_CPPFLAGS);
+	echo "############################"; \
+	echo T_CPPFLAGS: $(T_CPPFLAGS); \
+	echo "############################"; \
+	echo T_LINKFLAGS: $(T_LINKFLAGS); \
+	echo "############################"; \
+	echo TITAN_DEPS: $(TITAN_DEPS); \
+	echo "############################"; \
+	echo T_CONFIG_OPTS: $(T_CONFIG_OPTS); \
+	echo "############################"; \
+	echo MEDIAFW: $(MEDIAFW); \
+	echo "############################"; \
+	echo MEDIAFW_DEP: $(MEDIAFW_DEP); \
+	echo "############################";
 	$(TOUCH)
 	rm -f $(BUILD_TMP)/BUILD/uimage.*
 
@@ -233,20 +244,17 @@ $(SOURCE_DIR)/titan/titan/config.status:
 			$(TITAN_OPT_OPTION) \
 			PKG_CONFIG=$(PKG_CONFIG) \
 			CPPFLAGS="$(T_CPPFLAGS)"
-#		$(MAKE) linux CC=$(TARGET)-gcc CPPFLAGS="$(T_CPPFLAGS) -fPIC" LDFLAGS="-L$(TARGET_DIR)/usr/lib" BUILDMODE=dynamic PKG_VERSION=$(LUA_VER); \
-	touch $@
+	$(TOUCH)
 
 $(D)/titan.do_compile: $(SOURCE_DIR)/titan/titan/config.status
 	cd $(SOURCE_DIR)/titan/titan && \
-#		$(MAKE) linux CC=$(TARGET)-gcc CPPFLAGS="$(T_CPPFLAGS) -fPIC" LDFLAGS="-L$(TARGET_DIR)/usr/lib" BUILDMODE=dynamic PKG_VERSION=$(LUA_VER); \
 		$(MAKE) all
-	touch $@
+	$(TOUCH)
 
 $(D)/titan: titan.do_prepare titan.do_compile
-#	$(MAKE) CC=$(TARGET)-gcc CPPFLAGS="$(T_CPPFLAGS) -fPIC" LDFLAGS="-L$(TARGET_DIR)/usr/lib" BUILDMODE=dynamic PKG_VERSION=$(LUA_VER) -C $(SOURCE_DIR)/titan/titan install DESTDIR=$(TARGET_DIR)
 	$(MAKE) -C $(SOURCE_DIR)/titan/titan install DESTDIR=$(TARGET_DIR)
 	$(TARGET)-strip $(TARGET_DIR)/usr/local/bin/titan
-	touch $@
+	$(TOUCH)
 	
 titan-clean:
 	rm -f $(BUILD_TMP)/BUILD/uimage.*
@@ -273,7 +281,7 @@ $(D)/titan-libdreamdvd.do_prepare: | bootstrap libdvdnav
 	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
 	ln -s $(SOURCE_DIR)/titan/libdreamdvd $(SOURCE_DIR)/titan/titan; \
-	touch $@
+	$(TOUCH)
 
 $(SOURCE_DIR)/titan/libdreamdvd/config.status:
 	export PATH=$(hostprefix)/bin:$(PATH) && \
@@ -289,16 +297,16 @@ $(SOURCE_DIR)/titan/libdreamdvd/config.status:
 			--host=$(TARGET) \
 			--prefix=/usr && \
 		$(MAKE) all
-	touch $@
+	$(TOUCH)
 
 $(D)/titan-libdreamdvd.do_compile: $(SOURCE_DIR)/titan/libdreamdvd/config.status
 	cd $(SOURCE_DIR)/titan/libdreamdvd && \
 		$(MAKE)
-	touch $@
+	$(TOUCH)
 
 $(D)/titan-libdreamdvd: titan-libdreamdvd.do_prepare titan-libdreamdvd.do_compile
 	$(MAKE) -C $(SOURCE_DIR)/titan/libdreamdvd install DESTDIR=$(TARGET_DIR)
-	touch $@
+	$(TOUCH)
 
 titan-libdreamdvd-clean:
 	rm -f $(D)/titan-libdreamdvd
@@ -312,7 +320,6 @@ titan-libdreamdvd-distclean:
 #
 # titan-plugins
 #
-
 #$(D)/titan-plugins.do_prepare: | libpng libjpeg libfreetype libcurl
 $(D)/titan-plugins.do_prepare: | libpng libjpeg freetype libcurl
 	[ -d "$(SOURCE_DIR)/titan" ] && \
@@ -322,7 +329,7 @@ $(D)/titan-plugins.do_prepare: | libpng libjpeg freetype libcurl
 	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
 	ln -s $(SOURCE_DIR)/titan/libdreamdvd $(SOURCE_DIR)/titan/titan;
 	ln -s $(SOURCE_DIR)/titan/titan $(SOURCE_DIR)/titan/plugins;
-	touch $@
+	$(TOUCH)
 
 $(SOURCE_DIR)/titan/plugins/config.status: titan-libdreamdvd
 	export PATH=$(hostprefix)/bin:$(PATH) && \
@@ -334,17 +341,16 @@ $(SOURCE_DIR)/titan/plugins/config.status: titan-libdreamdvd
 	$(CONFIGURE) --prefix= \
 	$(if $(MULTICOM324), --enable-multicom324) \
 	$(if $(EPLAYER3), --enable-eplayer3)
-	touch $@
+	$(TOUCH)
 
 $(D)/titan-plugins.do_compile: $(SOURCE_DIR)/titan/plugins/config.status
 	cd $(SOURCE_DIR)/titan/plugins && \
 			$(MAKE) -C $(SOURCE_DIR)/titan/plugins all install DESTDIR=$(TARGET_DIR)
-#			$(MAKE) -C $(SOURCE_DIR)/titan/plugins all install DESTDIR=$(prefix)/$*cdkroot
-	touch $@
+	$(TOUCH)
 
 $(D)/titan-plugins: titan-plugins.do_prepare titan-plugins.do_compile
 	$(MAKE) -C $(SOURCE_DIR)/titan/plugins all install DESTDIR=$(TARGET_DIR)
-	touch $@
+	$(TOUCH)
 
 titan-plugins-clean:
 	rm -f $(D)/titan-plugins
@@ -387,7 +393,7 @@ $(D)/tuxtxtlib: $(D)/bootstrap
 	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/tuxbox-tuxtxt.pc
 	$(REWRITE_LIBTOOL)/libtuxtxt.la
 	$(REMOVE)/tuxtxtlib
-	touch $@
+	$(TOUCH)
 
 #
 # tuxtxt32bpp
@@ -417,7 +423,7 @@ $(D)/tuxtxt32bpp: $(D)/bootstrap $(D)/tuxtxtlib
 		$(MAKE) install prefix=/usr DESTDIR=$(TARGET_DIR)
 	$(REWRITE_LIBTOOL)/libtuxtxt32bpp.la
 	$(REMOVE)/tuxtxt
-	touch $@
+	$(TOUCH)
 
 #
 # titan-libipkg
@@ -429,7 +435,7 @@ $(D)/titan-libipkg.do_prepare: | bootstrap libdvdnav
 	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libipkg" ] || \
 	ln -s $(SOURCE_DIR)/titan/libipkg $(SOURCE_DIR)/titan/titan; \
-	touch $@
+	$(TOUCH)
 
 $(SOURCE_DIR)/titan/libipkg/config.status:
 	export PATH=$(hostprefix)/bin:$(PATH) && \
@@ -445,16 +451,16 @@ $(SOURCE_DIR)/titan/libipkg/config.status:
 			--host=$(TARGET) \
 			--prefix=/usr && \
 		$(MAKE) all
-	touch $@
+	$(TOUCH)
 
 $(D)/titan-libipkg.do_compile: $(SOURCE_DIR)/titan/libipkg/config.status
 	cd $(SOURCE_DIR)/titan/libipkg && \
 		$(MAKE)
-	touch $@
+	$(TOUCH)
 
 $(D)/titan-libipkg: titan-libipkg.do_prepare titan-libipkg.do_compile
 	$(MAKE) -C $(SOURCE_DIR)/titan/libipkg install DESTDIR=$(TARGET_DIR)
-	touch $@
+	$(TOUCH)
 
 titan-libipkg-clean:
 	rm -f $(D)/titan-libipkg
@@ -464,5 +470,4 @@ titan-libipkg-clean:
 titan-libipkg-distclean:
 	rm -f $(D)/titan-libipkg*
 	rm -rf $(SOURCE_DIR)/titan/libipkg	
-
 
