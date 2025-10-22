@@ -1745,6 +1745,122 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDU
 			$(FFMPEG_DISABLE) \
 			\
 			\
+			--enable-muxers \
+			--enable-muxer=flac \
+			--enable-muxer=mp3 \
+			--enable-muxer=h261 \
+			--enable-muxer=h263 \
+			--enable-muxer=h264 \
+			--enable-muxer=image2 \
+			--enable-muxer=mpeg1video \
+			--enable-muxer=mpeg2video \
+			--enable-muxer=mpegts \
+			--enable-muxer=ogg \
+			\
+			--enable-parsers \
+			--enable-parser=aac \
+			--enable-parser=aac_latm \
+			--enable-parser=ac3 \
+			--enable-parser=dca \
+			--enable-parser=dvbsub \
+			--enable-parser=dvdsub \
+			--enable-parser=flac \
+			--enable-parser=h264 \
+			--enable-parser=mjpeg \
+			--enable-parser=mpeg4video \
+			--enable-parser=mpegvideo \
+			--enable-parser=mpegaudio \
+			--enable-parser=vc1 \
+			--enable-parser=vorbis \
+			\
+			--enable-encoders \
+			--enable-encoder=aac \
+			--enable-encoder=h261 \
+			--enable-encoder=h263 \
+			--enable-encoder=h263p \
+			--enable-encoder=ljpeg \
+			--enable-encoder=mjpeg \
+			--enable-encoder=mpeg1video \
+			--enable-encoder=mpeg2video \
+			--enable-encoder=png \
+			\
+			--enable-decoders \
+			--enable-decoder=aac \
+			--enable-decoder=aac_latm \
+			--enable-decoder=dca \
+			--enable-decoder=dvbsub \
+			--enable-decoder=dvdsub \
+			--enable-decoder=flac \
+			--enable-decoder=h261 \
+			--enable-decoder=h263 \
+			--enable-decoder=h263i \
+			--enable-decoder=h264 \
+			--enable-decoder=mjpeg \
+			--enable-decoder=mp3 \
+			--enable-decoder=movtext \
+			--enable-decoder=mpeg1video \
+			--enable-decoder=mpeg2video \
+			--enable-decoder=msmpeg4v1 \
+			--enable-decoder=msmpeg4v2 \
+			--enable-decoder=msmpeg4v3 \
+			--enable-decoder=pcm_s16le \
+			--enable-decoder=pcm_s16be \
+			--enable-decoder=pcm_s16le_planar \
+			--enable-decoder=pcm_s16be_planar \
+			--enable-decoder=pgssub \
+			--enable-decoder=png \
+			--enable-decoder=ra_144 \
+			--enable-decoder=ra_288 \
+			--enable-decoder=rawvideo \
+			--enable-decoder=srt \
+			--enable-decoder=subrip \
+			--enable-decoder=subviewer \
+			--enable-decoder=subviewer1 \
+			--enable-decoder=text \
+			--enable-decoder=theora \
+			--enable-decoder=vorbis \
+			--enable-decoder=wmv3 \
+			--enable-decoder=xsub \
+			--enable-decoder=wmapro \
+			--enable-decoder=wmav1 \
+			--enable-decoder=wmav2 \
+			--enable-decoder=wmavoice \
+			\
+			--enable-demuxers \
+			--enable-demuxer=aac \
+			--enable-demuxer=ac3 \
+			--enable-demuxer=avi \
+			--enable-demuxer=dts \
+			--enable-demuxer=dash \
+			--enable-demuxer=flac \
+			--enable-demuxer=flv \
+			--enable-demuxer=hds \
+			--enable-demuxer=hls \
+			--enable-demuxer=image2 \
+			--enable-demuxer=image2pipe \
+			--enable-demuxer=image_jpeg_pipe \
+			--enable-demuxer=image_png_pipe \
+			--enable-demuxer=matroska \
+			--enable-demuxer=mjpeg \
+			--enable-demuxer=mov \
+			--enable-demuxer=mp3 \
+			--enable-demuxer=mpegts \
+			--enable-demuxer=mpegtsraw \
+			--enable-demuxer=mpegps \
+			--enable-demuxer=mpegvideo \
+			--enable-demuxer=ogg \
+			--enable-demuxer=pcm_s16be \
+			--enable-demuxer=pcm_s16le \
+			--enable-demuxer=rm \
+			--enable-demuxer=rtp \
+			--enable-demuxer=rtsp \
+			--enable-demuxer=srt \
+			--enable-demuxer=vc1 \
+			--enable-demuxer=wav \
+			\
+			\
+			--enable-filters \
+			--enable-filter=scale \
 			\
 			--disable-xlib \
 			--disable-libxcb \
