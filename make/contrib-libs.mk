@@ -1674,7 +1674,6 @@ FFMPEG_DISABLE = 			--enable-muxer=mpeg1video \
 else
 #FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
 #FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
-
 FFMPEG_EXTERN = $(D)/libroxml
 FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
 endif
@@ -1685,8 +1684,13 @@ ifeq ($(BOXTYPE), $(filter $(BOXTYPE), spark))
 FFMPEG_EXTERN = $(D)/libass
 endif
 ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
+FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
+FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
+else
 FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2 $(D)/libbluray
 FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
+endif
 endif
 endif
 
@@ -1694,6 +1698,95 @@ ifeq ($(BOXARCH), sh4)
 FFMPEG_CONF_OPTS += --disable-armv5te --disable-armv6 --disable-armv6t2
 endif
 
+ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
+$(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDUMP) $(ARCHIVE)/$(FFMPEG_SOURCE)
+	$(START_BUILD)
+	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
+	$(UNTAR)/$(FFMPEG_SOURCE)
+	set -e; cd $(BUILD_TMP)/ffmpeg-$(FFMPEG_VER); \
+		$(call post_patch,$(FFMPEG_PATCH)); \
+		./configure \
+			--disable-ffplay \
+			--disable-ffprobe \
+			\
+			--disable-doc \
+			--disable-htmlpages \
+			--disable-manpages \
+			--disable-podpages \
+			--disable-txtpages \
+			\
+			--disable-altivec \
+			--disable-amd3dnow \
+			--disable-amd3dnowext \
+			--disable-mmx \
+			--disable-mmxext \
+			--disable-sse \
+			--disable-sse2 \
+			--disable-sse3 \
+			--disable-ssse3 \
+			--disable-sse4 \
+			--disable-sse42 \
+			--disable-avx \
+			--disable-fma4 \
+			--disable-vfp \
+			--disable-neon \
+			--disable-inline-asm \
+			--disable-yasm \
+			--disable-mips32r2 \
+			--disable-mipsdspr2 \
+			--disable-mipsfpu \
+			--disable-fast-unaligned \
+			\
+			--disable-dxva2 \
+			--disable-vaapi \
+			--disable-vdpau \
+			\
+			$(FFMPEG_DISABLE) \
+			\
+			\
+			\
+			--disable-xlib \
+			--disable-libxcb \
+			--disable-postproc \
+			--enable-bsfs \
+			--disable-indevs \
+			--disable-outdevs \
+			--enable-bzlib \
+			--enable-zlib \
+			$(FFMPEG_CONF_OPTS) \
+			--disable-static \
+			--enable-openssl \
+			--enable-network \
+			--enable-shared \
+			--enable-small \
+			--enable-stripping \
+			--disable-debug \
+			--disable-runtime-cpudetect \
+			--enable-cross-compile \
+			--cross-prefix=$(TARGET)- \
+			--extra-cflags="-I$(TARGET_DIR)/usr/include/libxml2 -I$(TARGET_DIR)/usr/include -ffunction-sections -fdata-sections" \
+			--extra-ldflags="$(TARGET_LDFLAGS) -lrt" \
+			--target-os=linux \
+			--arch=$(BOXARCH) \
+			--prefix=/usr \
+			--bindir=/sbin \
+			--mandir=/.remove \
+			--datadir=/.remove \
+			--docdir=/.remove \
+		; \
+		$(MAKE); \
+		$(MAKE) install DESTDIR=$(TARGET_DIR)
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libavcodec.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libavdevice.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libavfilter.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libavformat.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libavutil.pc
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libswresample.pc
+	test -e $(PKG_CONFIG_PATH)/libswscale.pc && $(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libswscale.pc || true
+	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
+	$(TOUCH)
+else
 $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDUMP) $(ARCHIVE)/$(FFMPEG_SOURCE)
 	$(START_BUILD)
 	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
@@ -1902,6 +1995,8 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDU
 	test -e $(PKG_CONFIG_PATH)/libswscale.pc && $(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libswscale.pc || true
 	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
 	$(TOUCH)
+endif
+endif
 
 #
 # libass
