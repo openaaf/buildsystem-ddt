@@ -2,11 +2,19 @@
 # titan
 #
 
+ifeq ($(FFMPEG_VER), 3.2.2)
+OPENSSL_MAJOR = 1.0.2
+else
+OPENSSL_MAJOR = 1.1.1
+endif
+
 TITAN_VER = 2.05
 
 TITAN_DEPS     = $(D)/bootstrap
 TITAN_DEPS    += $(KERNEL)
-TITAN_DEPS    += $(D)/libopenthreads
+ifeq ($(whoami), $(filter $(whoami), obi))
+#TITAN_DEPS    += $(D)/libopenthreads
+endif
 TITAN_DEPS    += $(D)/system-tools
 TITAN_DEPS    += $(D)/module_init_tools
 TITAN_DEPS    += $(LIRC)
@@ -20,7 +28,9 @@ TITAN_DEPS    += $(D)/timezone
 TITAN_DEPS    += $(D)/libcurl
 T_CPPFLAGS    += -DSH4
 #T_CPPFLAGS    += -DSH4NEW
+ifeq ($(OPENSSL_MAJOR), 1.1.1)
 T_CPPFLAGS    += -DSSLNEW
+endif
 T_CPPFLAGS    += -DDDTBUILD
 T_CPPFLAGS    += -DDVDPLAYER 
 T_CPPFLAGS    += -DCAMSUPP
@@ -86,12 +96,6 @@ endif
 
 T_CONFIG_OPTS +=$(LOCAL_TITAN_BUILD_OPTIONS)
 
-T_CPPFLAGS    += -DSH4
-#T_CPPFLAGS    += -DSH4NEW
-T_CPPFLAGS    += -DSSLNEW
-T_CPPFLAGS    += -DDDTBUILD
-T_CPPFLAGS    += -DDVDPLAYER 
-T_CPPFLAGS    += -DCAMSUPP
 T_LINKFLAGS    += -lssl -lcrypto -lcurl -lm -lpthread -ldl -lpng -lfreetype -ldreamdvd -ljpeg -lz -lmmeimage -lipkg
 
 ifeq ($(MEDIAFW), eplayer3)
@@ -173,6 +177,7 @@ TITAN_DEPS  += bootstrap alsa_utils libcurl curlftpfs rarfs freetype libjpeg lib
 else
 TITAN_DEPS  += bootstrap alsa_utils libcurl curlftpfs rarfs djmount freetype libjpeg libpng ffmpeg titan-libipkg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
 endif
+#librtmpdump
 
 #TITAN_DEPS  = bootstrap libcurl curlftpfs rarfs djmount freetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tools-libmme_host tools-libmme_image
 
@@ -182,7 +187,7 @@ $(D)/titan.do_prepare: | $(TITAN_DEPS)
 	[ -d "$(SOURCE_DIR)/titan" ] && \
 	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
-	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
+	svn checkout --username buildbin --password buildbin http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	COMPRESSBIN=gzip; \
 	COMPRESSEXT=gz; \
 	[ $(BOXTYPE) == "ufs910" ] && COMPRESSBIN=lzma; \
@@ -278,7 +283,7 @@ $(D)/titan-libdreamdvd.do_prepare: | bootstrap libdvdnav
 	[ -d "$(SOURCE_DIR)/titan" ] && \
 	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
-	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
+	svn checkout --username buildbin --password buildbin http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
 	ln -s $(SOURCE_DIR)/titan/libdreamdvd $(SOURCE_DIR)/titan/titan; \
 	$(TOUCH)
@@ -325,7 +330,7 @@ $(D)/titan-plugins.do_prepare: | libpng libjpeg freetype libcurl
 	[ -d "$(SOURCE_DIR)/titan" ] && \
 	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
-	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
+	svn checkout --username buildbin --password buildbin http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
 	ln -s $(SOURCE_DIR)/titan/libdreamdvd $(SOURCE_DIR)/titan/titan;
 	ln -s $(SOURCE_DIR)/titan/titan $(SOURCE_DIR)/titan/plugins;
@@ -432,7 +437,7 @@ $(D)/titan-libipkg.do_prepare: | bootstrap libdvdnav
 	[ -d "$(SOURCE_DIR)/titan" ] && \
 	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
-	svn checkout --username public --password public http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
+	svn checkout --username buildbin --password buildbin http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libipkg" ] || \
 	ln -s $(SOURCE_DIR)/titan/libipkg $(SOURCE_DIR)/titan/titan; \
 	$(TOUCH)

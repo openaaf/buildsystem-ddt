@@ -1,3 +1,5 @@
+FFMPEG_VER = 3.2.2
+
 #
 # ncurses
 #
@@ -1522,8 +1524,9 @@ $(D)/libx264: $(D)/bootstrap $(D)/libx264
 #
 # ffmpeg
 #
-#FFMPEG_VER = 2.8.10
-FFMPEG_VER = 3.2.2
+#version read from make.sh
+#default
+#FFMPEG_VER = 3.2.2
 #ufs912
 #FFMPEG_VER = 3.4.2
 #ufs912 full
@@ -1597,21 +1600,10 @@ FFMPEG_EXTERN = $(D)/libroxml
 endif
 
 ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
-	FFMPEG_CONF_OPTS  = --enable-librtmp
-	LIBRTMPDUMP = $(D)/librtmpdump
-			#FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
-			#FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
-#			FFMPEG_EXTERN = $(D)/libroxml
-			FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
-
-#		ifeq ($(BOXTYPE), $(filter $(BOXTYPE), spark7162))
-#			FFMPEG_EXTERN = $(D)/libass
-#		endif
-#		ifeq ($(BOXTYPE), $(filter $(BOXTYPE), spark))
-#			FFMPEG_EXTERN = $(D)/libass
-#		endif
-ifeq ($(FFMPEG_VER), 4.3.2)
+	ifeq ($(FFMPEG_VER), 4.3.2)
 		ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+				FFMPEG_CONF_OPTS  = --enable-librtmp
+				LIBRTMPDUMP = $(D)/librtmpdump
 			##ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
 				FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2  $(D)/libbluray $(D)/libx264
 				FFMPEG_CONF_OPTS  += --enable-libxml2 --enable-libass --enable-libbluray --enable-protocol=bluray --enable-libx264 --enable-encoder=libx264 --enable-demuxer=h264 --enable-muxer=dash --enable-gpl --enable-nonfree
@@ -1620,16 +1612,19 @@ ifeq ($(FFMPEG_VER), 4.3.2)
 				##FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
 			##endif
 		endif
+	else
+#	FFMPEG_EXTERN = $(D)/libroxml
+	FFMPEG_EXTERN =
+	FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
+	endif
+
+#ifneq ($(BOXTYPE), $(filter $(BOXTYPE), ufs910 ufs922))
+#FFMPEG_CONF_OPTS = --enable-muxer=hevc --enable-parser=hevc --enable-decoder=hevc
+#endif
+
 endif
-		endif
 
-		ifeq ($(BOXARCH), sh4)
-		FFMPEG_CONF_OPTS += --disable-armv5te --disable-armv6 --disable-armv6t2
-		endif
-
-#			--enable-muxers \
-#
-#
+	FFMPEG_CONF_OPTS += --disable-armv5te --disable-armv6 --disable-armv6t2
 
 $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDUMP) $(ARCHIVE)/$(FFMPEG_SOURCE)
 	$(START_BUILD)
@@ -1839,7 +1834,6 @@ $(D)/ffmpeg: $(D)/bootstrap $(D)/openssl $(D)/bzip2 $(FFMPEG_EXTERN) $(LIBRTMPDU
 	test -e $(PKG_CONFIG_PATH)/libswscale.pc && $(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libswscale.pc || true
 	$(REMOVE)/ffmpeg-$(FFMPEG_VER)
 	$(TOUCH)
-endif
 
 #
 # libass
@@ -2447,17 +2441,17 @@ $(D)/libopenthreads: $(D)/bootstrap $(ARCHIVE)/$(LIBOPENTHREADS_SOURCE)
 #
 # librtmpdump
 #
-ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
+
+ifeq ($(OPENSSL_MAJOR), 1.1.1)
 LIBRTMPDUMP_VER = 6f6bb1353fc84f4cc37138baa99f586750028a01
 LIBRTMPDUMP_URL = git://git.ffmpeg.org/rtmpdump
-#LIBRTMPDUMP_PATCH = rtmpdump-2.4.patch
 LIBRTMPDUMP_PATCH = rtmpdump-2.6.patch
 EXTRA = $(D)/gnutls
 else
 LIBRTMPDUMP_VER = ad70c64
 LIBRTMPDUMP_URL = https://github.com/oe-alliance/rtmpdump.git
 LIBRTMPDUMP_PATCH = rtmpdump-2.4.patch
-EXTRA = ""
+EXTRA = 
 endif
 LIBRTMPDUMP_SOURCE = librtmpdump-$(LIBRTMPDUMP_VER).tar.bz2
 
