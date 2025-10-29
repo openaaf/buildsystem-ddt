@@ -1,5 +1,3 @@
-FFMPEG_VER = 3.2.2
-
 #
 # ncurses
 #
