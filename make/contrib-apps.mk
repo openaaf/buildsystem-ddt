@@ -1364,7 +1364,7 @@ WPA_SUPPLICANT_SOURCE = wpa_supplicant-$(WPA_SUPPLICANT_VER).tar.gz
 $(ARCHIVE)/$(WPA_SUPPLICANT_SOURCE):
 	$(WGET) https://w1.fi/releases/$(WPA_SUPPLICANT_SOURCE)
 
-ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
+ifeq ($(OPENSSL_MAJOR), 1.1.1)
 $(D)/wpa_supplicant: $(D)/bootstrap $(D)/openssl $(D)/wireless_tools $(D)/libnl $(D)/dbus $(ARCHIVE)/$(WPA_SUPPLICANT_SOURCE)
 else
 $(D)/wpa_supplicant: $(D)/bootstrap $(D)/openssl $(D)/wireless_tools $(ARCHIVE)/$(WPA_SUPPLICANT_SOURCE)
