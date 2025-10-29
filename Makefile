@@ -49,6 +49,8 @@ printenv:
 	@echo "MEDIAFW          : $(MEDIAFW)"
 	@echo "PARALLEL_JOBS    : $(PARALLEL_JOBS)"
 	@echo "IMAGE            : $(IMAGE)"
+	@echo "BUILDUSER        : $(BUILDUSER)"
+	@echo "FFMPEG_VER       : $(FFMPEG_VER)"
 	@echo '================================================================================'
 ifeq ($(IMAGE), $(filter $(IMAGE), neutrino neutrino-wlandriver))
 	@echo "LOCAL_NEUTRINO_BUILD_OPTIONS : $(LOCAL_NEUTRINO_BUILD_OPTIONS)"
