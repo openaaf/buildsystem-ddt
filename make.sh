@@ -293,8 +293,8 @@ esac
 echo "FFMPEG_VER=$FFMPEG_VER" >> config
 echo "BUILDUSER=$(whoami)" >> config
 
-BUILD_SERVER_VER=$(cat /etc/os-release | sed -nr 's/.*VERSION_ID="([^"]+)".*/\1/p')
-echo "BUILD_SERVER_VER=$BUILD_SERVER_VER" >> config
+HOST_VERSION_ID=$(cat /etc/os-release | sed -nr 's/.*VERSION_ID="([^"]+)".*/\1/p')
+echo "HOST_VERSION_ID=$HOST_VERSION_ID" >> config
 
 ##############################################
 echo " "

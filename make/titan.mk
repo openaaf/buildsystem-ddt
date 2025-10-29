@@ -171,7 +171,7 @@ yaud-titan: yaud-none \
 #TITAN_DEPS  = bootstrap libcurl curlftpfs rarfs djmount libfreetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
 
 
-ifeq ($(BUILD_SERVER_VER), 18.04)
+ifeq ($(HOST_VERSION_ID), 18.04)
 TITAN_DEPS  += bootstrap alsa_utils libcurl curlftpfs rarfs djmount freetype libjpeg libpng ffmpeg titan-libipkg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
 else
 ifeq ($(whoami), $(filter $(whoami), obi))

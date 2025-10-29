@@ -286,7 +286,7 @@ $(D)/portmap: $(D)/bootstrap $(D)/lsb $(ARCHIVE)/$(PORTMAP_SOURCE) $(ARCHIVE)/po
 # e2fsprogs
 #
 
-ifeq ($(BUILD_SERVER_VER), 18.04)
+ifeq ($(HOST_VERSION_ID), 18.04)
 E2FSPROGS_VER = 1.43.7
 else
 #ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
