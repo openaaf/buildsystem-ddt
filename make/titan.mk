@@ -171,12 +171,15 @@ yaud-titan: yaud-none \
 #TITAN_DEPS  = bootstrap libcurl curlftpfs rarfs djmount libfreetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
 
 
-ifeq ($(whoami), $(filter $(whoami), obi))
-# remove djmount not building on linux mint 22.04
-TITAN_DEPS  += bootstrap alsa_utils libcurl curlftpfs rarfs freetype libjpeg libpng ffmpeg titan-libipkg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
-else
+ifeq ($(BUILD_SERVER_VER), 18.04)
 TITAN_DEPS  += bootstrap alsa_utils libcurl curlftpfs rarfs djmount freetype libjpeg libpng ffmpeg titan-libipkg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
+else
+ifeq ($(whoami), $(filter $(whoami), obi))
+# remove djmount not building currently on linux mint 22.04
+TITAN_DEPS  += bootstrap alsa_utils libcurl curlftpfs rarfs freetype libjpeg libpng ffmpeg titan-libipkg titan-libdreamdvd $(MEDIAFW_DEP) tuxtxt32bpp tools-libmme_host tools-libmme_image
+#endif
 endif
+
 #librtmpdump
 
 #TITAN_DEPS  = bootstrap libcurl curlftpfs rarfs djmount freetype libjpeg libpng ffmpeg titan-libdreamdvd $(MEDIAFW_DEP) tools-libmme_host tools-libmme_image
