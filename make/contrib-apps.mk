@@ -1,3 +1,9 @@
+ifeq ($(FFMPEG_VER), 3.2.2)
+OPENSSL_MAJOR = 1.0.2
+else
+OPENSSL_MAJOR = 1.1.1
+endif
+
 #
 # busybox
 #
@@ -1348,7 +1354,7 @@ $(D)/wireless_tools: $(D)/bootstrap $(ARCHIVE)/$(WIRELESS_TOOLS_SOURCE)
 #
 # wpa_supplicant
 #
-ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
+ifeq ($(OPENSSL_MAJOR), 1.1.1)
 WPA_SUPPLICANT_VER = 2.9
 else
 WPA_SUPPLICANT_VER = 0.7.3
