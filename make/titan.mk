@@ -284,7 +284,7 @@ titan-updateyaud: titan-clean titan
 #
 $(D)/titan-libdreamdvd.do_prepare: | bootstrap libdvdnav
 	[ -d "$(SOURCE_DIR)/titan" ] && \
-	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
+	(cd $(SOURCE_DIR)/titan; svn up --username buildbin --password buildbin; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
 	svn checkout --username buildbin --password buildbin http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
@@ -331,7 +331,7 @@ titan-libdreamdvd-distclean:
 #$(D)/titan-plugins.do_prepare: | libpng libjpeg libfreetype libcurl
 $(D)/titan-plugins.do_prepare: | libpng libjpeg freetype libcurl
 	[ -d "$(SOURCE_DIR)/titan" ] && \
-	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
+	(cd $(SOURCE_DIR)/titan; svn up --username buildbin --password buildbin; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
 	svn checkout --username buildbin --password buildbin http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libdreamdvd" ] || \
@@ -438,7 +438,7 @@ $(D)/tuxtxt32bpp: $(D)/bootstrap $(D)/tuxtxtlib
 #
 $(D)/titan-libipkg.do_prepare: | bootstrap libdvdnav
 	[ -d "$(SOURCE_DIR)/titan" ] && \
-	(cd $(SOURCE_DIR)/titan; svn up; cd "$(BUILD_TMP)";); \
+	(cd $(SOURCE_DIR)/titan; svn up --username buildbin --password buildbin; cd "$(BUILD_TMP)";); \
 	[ -d "$(SOURCE_DIR)/titan" ] || \
 	svn checkout --username buildbin --password buildbin http://svn.dyndns.tv/svn/titan $(SOURCE_DIR)/titan; \
 	[ -d "$(SOURCE_DIR)/titan/titan/libipkg" ] || \
