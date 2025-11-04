@@ -1599,7 +1599,7 @@ endif
 
 ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
 	ifeq ($(FFMPEG_VER), 4.3.2)
-		ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912))
+		ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912_aus))
 				FFMPEG_CONF_OPTS  = --enable-librtmp
 				LIBRTMPDUMP = $(D)/librtmpdump
 			##ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
@@ -1609,11 +1609,16 @@ ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
 				##FFMPEG_EXTERN = $(D)/libass $(D)/libroxml $(D)/libxml2 $(D)/libbluray
 				##FFMPEG_CONF_OPTS  += --enable-libass --enable-libbluray --enable-protocol=bluray
 			##endif
+		else
+			FFMPEG_CONF_OPTS   = --disable-librtmp
+			FFMPEG_EXTERN =
+			FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
 		endif
 	else
-#	FFMPEG_EXTERN = $(D)/libroxml
-	FFMPEG_EXTERN =
-	FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
+	#	FFMPEG_EXTERN = $(D)/libroxml
+		FFMPEG_CONF_OPTS   = --disable-librtmp
+		FFMPEG_EXTERN =
+		FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
 	endif
 
 #ifneq ($(BOXTYPE), $(filter $(BOXTYPE), ufs910 ufs922))
