@@ -1597,6 +1597,11 @@ FFMPEG_CONF_OPTS = --disable-iconv
 FFMPEG_EXTERN = $(D)/libroxml
 endif
 
+FFMPEG_DISABLE = --disable-muxers --disable-parsers --disable-encoders --disable-decoders --disable-demuxers --disable-filters
+#ifeq ($(BUILDUSER), $(filter $(BUILDUSER), obi))
+#FFMPEG_DISABLE =
+#endif
+
 ifeq ($(IMAGE), $(filter $(IMAGE), titan titan-wlandriver))
 	ifeq ($(FFMPEG_VER), 4.3.2)
 		ifeq ($(BOXTYPE), $(filter $(BOXTYPE), ufs912_aus))
